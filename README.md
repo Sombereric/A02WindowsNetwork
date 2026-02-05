@@ -96,7 +96,14 @@ game asks to replay or end
 client closes
 
 
-Client Protocol
+Client Protocol (should use some sort of number key system to make protocols easier to use ex: guess = 200)
+    Server Online: 
+        -Client is turned on or start game is pressed.
+        -this pings the server to check if the server is online or not.
+    Guess:
+        -client sends a word to the server as a gues-
+        -server must respond with a correct guess or wrong guess with updated list of all guessed words and timer
+    
 
 Server Protocol
 
@@ -129,5 +136,3 @@ words from right to left
     won
     test
     no
-
-helpleasetsetablenjoyablendad
