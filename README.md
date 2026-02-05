@@ -98,12 +98,23 @@ client closes
 
 Client Protocol (should use some sort of number key system to make protocols easier to use ex: guess = 200)
     Server Online: 
-        -Client is turned on or start game is pressed.
+        -Client logins
         -this pings the server to check if the server is online or not.
     Guess:
         -client sends a word to the server as a gues-
         -server must respond with a correct guess or wrong guess with updated list of all guessed words and timer
-    
+    New Game:
+        -client presses new game
+        -tells the server to create a new game state and adds to the list
+        -server responses with a code to tell the client if the server succeeded in creating the game state
+    Quit Game:
+        -users quits or hits the exit button in the wpf
+        -tells the server to delete the state session stored into a list
+        -server deletes state and responses to the client with the successful deletion and removes ip and port from list as well
+    Play Again:
+        -user selects play again
+        -replaces the stat with the new file
+        -server sends the newly sent up game state
 
 Server Protocol
 
@@ -117,6 +128,7 @@ Server Statebag (what is stored to determine a game state for a certain user)
     -list of total words
     -the difference between them to determine how many more to guess
 -Start Timer
+-file user is playing on
 
 Example Game:
 
