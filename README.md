@@ -117,6 +117,12 @@ Client Protocol (should use some sort of number key system to make protocols eas
         -server sends the newly sent up game state
 
 Server Protocol
+    Timer Run out:
+        -a game over of sorts
+    Server Going down:
+        -server being shut down for whatever reason
+    
+    
 
 Server Statebag (what is stored to determine a game state for a certain user)
 
