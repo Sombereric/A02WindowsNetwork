@@ -39,45 +39,46 @@ word search logic
 
 Failure when timer reaches zero
 
-
-
 Logic
 start game connects the client to the server.
 config button to change ip and such
 
-
 Four files
 
 File #1
-Line 1: helpleasetsetablenjoyablendad
-Line 2: 16 words
-left to right
-    help
-    plea
-    please
-    set
-    sets
-    table
-    len
-    joy
-    enjoyable
-    enjoy
-    able
-    end
-    blend
-    dad
-right to left
-    bat
-    test
+    Line 1: helpleasetsetablenjoyablendads
+    Line 2: 16 words
+    left to right
+        help
+        plea
+        please
+        set
+        sets
+        table
+        len
+        joy
+        enjoyable
+        enjoy
+        able
+        end
+        blend
+        dad
+        dads
+    right to left
+        bat
+        test
 
 File #2
-
+    Line 1: 
+    Line 2:
 
 File #3
-
+    Line 1: 
+    Line 2:
 
 file #4
-
+    Line 1: 
+    Line 2:
 
 GamePlay Flow
 user presses start game
@@ -98,8 +99,21 @@ client closes
 
 Client Protocol (should use some sort of number key system to make protocols easier to use ex: guess = 200)
     Server Online: 
-        -Client logins
-        -this pings the server to check if the server is online or not.
+        -Client Sends:
+            sends protocol id
+            sends login info
+            sends IP and port
+            Format                  Ex: 
+                PROTOCOL ID         200
+                USERNAME            eric
+                PASSWORD            pass123
+                IP                  127.0.0.1
+                PORT                5000
+        -Server sends:
+            server state
+            Format                  Ex:
+                PROTOCOL ID         200
+                SERVER STATE        OK
     Guess:
         -client sends a word to the server as a gues-
         -server must respond with a correct guess or wrong guess with updated list of all guessed words and timer
@@ -121,7 +135,7 @@ Server Protocol
         -a game over of sorts
     Server Going down:
         -server being shut down for whatever reason
-    
+
     
 
 Server Statebag (what is stored to determine a game state for a certain user)
@@ -135,22 +149,3 @@ Server Statebag (what is stored to determine a game state for a certain user)
     -the difference between them to determine how many more to guess
 -Start Timer
 -file user is playing on
-
-Example Game:
-
-30 character string: Anyonextsetesnow
-
-words from left to right
-    a
-    any
-    anyone
-    one
-    next
-    set
-    now
-    snow
-    yo
-words from right to left
-    won
-    test
-    no
