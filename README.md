@@ -109,11 +109,14 @@ Client Protocol (should use some sort of number key system to make protocols eas
                 PASSWORD            pass123
                 IP                  127.0.0.1
                 PORT                5000
+                END (used to tell the reader they have read it all)
         -Server sends:
             server state
             Format                  Ex:
                 PROTOCOL ID         200
-                SERVER STATE        OK
+                SERVER STATE        200
+                MESSAGE             explains server status
+                END (used to tell the reader they have read it all)
     Guess:
         -client sends a word to the server as a gues-
         -server must respond with a correct guess or wrong guess with updated list of all guessed words and timer
