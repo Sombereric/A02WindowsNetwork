@@ -8,5 +8,6 @@ namespace GuessingGameServer.GameLogic
 {
     internal class TimeChecker
     {
+        //where the time started on the state bag is checked to see if the user ran out of time
     }
 }
