@@ -20,5 +20,13 @@ namespace GuessingGameServer.UserInterface
             Console.WriteLine(message);
             return;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ReadFromConsole()
+        {
+            Console.ReadLine();
+            return;
+        }
     }
 }

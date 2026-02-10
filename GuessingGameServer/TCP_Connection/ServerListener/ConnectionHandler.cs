@@ -13,6 +13,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
     internal class ConnectionHandler
     {
         private UI ui = new UI();
+        private static CancellationTokenSource cts = new CancellationTokenSource();
         public void MainServerListener()
         {
             //gets the server port and IP from the config file
@@ -39,12 +40,57 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 server.Start();
 
                 ui.WriteToConsole("Server Listening on " + serverIPParsed.ToString() + ":" + port);
+
+                //where the task 
+
+                //accept loop on a task so console can stop server
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        while (!cts.Token.IsCancellationRequested)
+                        {
+                            ui.WriteToConsole("Server connection begun");
+                            serverClientWorker(server);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ui.WriteToConsole("Unexpected TCP Server failure: " + ex);
+                    }
+                });
+
+                ui.WriteToConsole("To stop the server Press Enter...");
+                ui.ReadFromConsole();
+
+                cts.Cancel();
+
+                StopTheClient();
+
+                server.Stop();
+
+                ui.WriteToConsole("Server Closed");
             }
             catch (Exception ex) 
             {
-                ui.WriteToConsole("");
+                ui.WriteToConsole("Unexpected server failure " + ex);
             }
             return;
+        }
+        /// <summary>
+        /// where the work is actually done on the server side
+        /// </summary>
+        /// <param name="server">the name of the server listening</param>
+        private void serverClientWorker(TcpListener server)
+        {
+
+        }
+        /// <summary>
+        /// stops the sub server clients
+        /// </summary>
+        private void StopTheClient()
+        {
+
         }
     }
 }
