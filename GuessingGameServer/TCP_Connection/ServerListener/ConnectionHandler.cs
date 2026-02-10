@@ -22,6 +22,9 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         private UI ui = new UI();
         private static CancellationTokenSource cts = new CancellationTokenSource();
         private static readonly List<TcpClient> clients = new List<TcpClient>();
+
+        ConnectionProtocol connectionProtocol = new ConnectionProtocol();
+
         /// <summary>
         /// where the server listens for connecting clients
         /// </summary>
@@ -171,17 +174,52 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         private async Task ConnectionClientHandler(TcpClient client)
         {
             NetworkStream stream = client.GetStream();
-
+            string checkMessage = "";
             try
             {
                 bool finishRead = false;
 
                 while (!finishRead && !cts.IsCancellationRequested && client.Connected)
                 {
+                    string checkBuffer = ConfigurationManager.AppSettings["BufferSizeBytes"];
+
+                    //attempts the parse the buffer size in the config file
+                    if (!int.TryParse(checkBuffer, out int bufferSize))
                     {
-                        //where you will parse the protocol and pass it in the connection protocol class
+                        ui.WriteToConsole("Failed to parse buffer in app.config");
                     }
+
+                    byte[] buffer = new byte[bufferSize];
+
+                    int bytesRead = 0;
+
+                    //handles any failures
+                    try
+                    {
+                        bytesRead = await stream.ReadAsync(buffer, 0, bufferSize, cts.Token);
+                    }
+                    catch (Exception ex)
+                    {
+                        ui.WriteToConsole(ex.ToString());
+                    }
+
+                    if (bytesRead == 0)
+                    {
+                        finishRead = true;
+                    }
+
+                    //IMPORTANT: decode only what was read
+                    checkMessage += Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
                 }
+
+                //data should be sent as a formated string
+                //protocol format:  PROTOCOLID|USERNAME|PASSWORD|IP|PORT
+                //protocol example: 200|eric|pass123|127.0.0.1|5000
+
+                char delimiter = '|';
+                string[] protocolMessage = checkMessage.Split(delimiter);
+
+                connectionProtocol.ServerProtocolManager(protocolMessage);
 
             }
             catch (Exception ex)
