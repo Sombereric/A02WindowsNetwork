@@ -44,24 +44,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
                 ui.WriteToConsole("Server Listening on " + serverIPParsed.ToString() + ":" + port);
 
-                //where the task 
-
-                //accept loop on a task so console can stop server
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        while (!cts.Token.IsCancellationRequested)
-                        {
-                            ui.WriteToConsole("Server connection begun");
-                            serverClientWorker(server);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ui.WriteToConsole("Unexpected TCP Server failure: " + ex);
-                    }
-                });
+                TaskRunner(server);
 
                 ui.WriteToConsole("To stop the server Press Enter...");
                 ui.ReadFromConsole();
@@ -135,6 +118,29 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     ui.WriteToConsole("Unexpected server failure " + ex);
                 }
             }
+        }
+        /// <summary>
+        /// where the tasks are handed 
+        /// </summary>
+        /// <param name="server">the server clients connect to</param>
+        private void TaskRunner(TcpListener server)
+        {
+            //accept loop on a task so console can stop server
+            Task.Run(() =>
+            {
+                try
+                {
+                    while (!cts.Token.IsCancellationRequested)
+                    {
+                        ui.WriteToConsole("Server connection begun");
+                        serverClientWorker(server);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ui.WriteToConsole("Unexpected TCP Server failure: " + ex);
+                }
+            });
         }
     }
 }
