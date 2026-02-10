@@ -1,11 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*
+* FILE : ConnectionHandler.cs
+* PROJECT : PROG2126 - Assignment #2
+* PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
+* FIRST VERSION : 2026-2-9
+* DESCRIPTION :
+* where the connection from the client to the server is handled on the server end
+*/
+
 using System.Configuration;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using GuessingGameServer.UserInterface;
 
 namespace GuessingGameServer.TCP_Connection.ServerListener
@@ -17,6 +22,9 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         private UI ui = new UI();
         private static CancellationTokenSource cts = new CancellationTokenSource();
         private static readonly List<TcpClient> clients = new List<TcpClient>();
+        /// <summary>
+        /// where the server listens for connecting clients
+        /// </summary>
         public void MainServerListener()
         {
             //gets the server port and IP from the config file
@@ -59,17 +67,9 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             }
             catch (Exception ex) 
             {
-                ui.WriteToConsole("Unexpected server failure " + ex);
+                ui.WriteToConsole("Unexpected server failure " + ex.Message);
             }
             return;
-        }
-        /// <summary>
-        /// where the work is actually done on the server side
-        /// </summary>
-        /// <param name="server">the name of the server listening</param>
-        private void serverClientWorker(TcpListener server)
-        {
-
         }
         /// <summary>
         /// stops the sub server clients
@@ -103,7 +103,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 }
                 catch (Exception ex)
                 {
-                    ui.WriteToConsole("Unexpected server failure " + ex);
+                    ui.WriteToConsole("Unexpected server failure " + ex.Message);
                 }
 
                 try
@@ -115,7 +115,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 }
                 catch (Exception ex)
                 {
-                    ui.WriteToConsole("Unexpected server failure " + ex);
+                    ui.WriteToConsole("Unexpected server failure " + ex.Message);
                 }
             }
         }
@@ -138,9 +138,68 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 }
                 catch (Exception ex)
                 {
-                    ui.WriteToConsole("Unexpected TCP Server failure: " + ex);
+                    ui.WriteToConsole("Unexpected TCP Server failure: " + ex.Message);
                 }
             });
+        }
+        /// <summary>
+        /// where the work is actually done on the server side
+        /// </summary>
+        /// <param name="server">the name of the server listening</param>
+        private void serverClientWorker(TcpListener server)
+        {
+            TcpClient client = server.AcceptTcpClient();
+
+            ui.WriteToConsole("Client Connected");
+
+            lock (locker)
+            {
+                clients.Add(client);
+            }
+
+            try
+            {
+                //where the tasks are created to handle
+                Task clientHandlerTask = Task.Run(async () => await ConnectionClientHandler(client));
+            }
+            catch (Exception ex)
+            {
+                ui.WriteToConsole("Failure during client connection: " + ex.Message);
+            }
+            return;
+        }
+        private async Task ConnectionClientHandler(TcpClient client)
+        {
+            NetworkStream stream = client.GetStream();
+
+            try
+            {
+                bool finishRead = false;
+
+                while (!finishRead && !cts.IsCancellationRequested && client.Connected)
+                {
+                    {
+                        //where you will parse the protocol and pass it in the connection protocol class
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ui.WriteToConsole("Client handler error: " + ex.Message);
+            }
+            finally
+            {
+                stream.Close();
+                client.Close();
+
+                lock (locker)
+                {
+                    clients.Remove(client);
+                }
+            }
+
+            return;
         }
     }
 }
