@@ -96,7 +96,6 @@ game ends
 game asks to replay or end
 client closes
 
-
 Client Protocol (should use some sort of number key system to make protocols easier to use ex: guess = 200)
     Server Online: 
         -Client Sends:
@@ -118,6 +117,10 @@ Client Protocol (should use some sort of number key system to make protocols eas
                 MESSAGE             explains server status
                 END (used to tell the reader they have read it all)
     Guess:
+        -Client Sends:
+
+        -Server sends:
+
         -client sends a word to the server as a gues-
         -server must respond with a correct guess or wrong guess with updated list of all guessed words and timer
     New Game:
@@ -152,3 +155,14 @@ Server Statebag (what is stored to determine a game state for a certain user)
     -the difference between them to determine how many more to guess
 -Start Timer
 -file user is playing on
+
+CheckList
+File structure
+connection between client and server
+    protocol
+add client list stored on server side
+server UI log
+file loader
+gameguesser
+game state
+time checker
