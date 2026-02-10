@@ -12,8 +12,11 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 {
     internal class ConnectionHandler
     {
+        private static readonly object locker = new object();
+
         private UI ui = new UI();
         private static CancellationTokenSource cts = new CancellationTokenSource();
+        private static readonly List<TcpClient> clients = new List<TcpClient>();
         public void MainServerListener()
         {
             //gets the server port and IP from the config file
@@ -90,7 +93,48 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// </summary>
         private void StopTheClient()
         {
+            List<TcpClient> clientsToStop = null;
 
+            lock (locker)
+            {
+                clientsToStop = new List<TcpClient>(clients);
+                clients.Clear();
+            }
+
+            //loops over all clients
+            for (int checkCount = 0; checkCount < clientsToStop.Count; checkCount++)
+            {
+                TcpClient client = clientsToStop[checkCount];
+
+                try
+                {
+                    NetworkStream stream = client.GetStream();
+
+                    byte[] stopMessage = Encoding.UTF8.GetBytes("STOP");
+
+                    stream.Write(stopMessage, 0, stopMessage.Length);
+                    stream.Flush();
+                    stream.Close();
+
+                    ui.WriteToConsole("Stop sent to client");
+                }
+                catch (Exception ex)
+                {
+                    ui.WriteToConsole("Unexpected server failure " + ex);
+                }
+
+                try
+                {
+                    if (client != null)
+                    {
+                        client.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ui.WriteToConsole("Unexpected server failure " + ex);
+                }
+            }
         }
     }
 }
