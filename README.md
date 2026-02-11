@@ -73,21 +73,21 @@ ____________________________
         left to right:                
         right to left:    
 ____________________________
-GamePlay Flow
-user presses start game
-client connects to the server
-server selects at random one of the 4 files
-server sends number of words to the client
-client disconnects from the server
-client then guesses a word
-client sends word to the server
-server checks if its in the string or not.
-gives the client a response depending on whether the word was inside or not
-displays newly found words
-client checks if full game is over
-game ends
-game asks to replay or end
-client closes
+GamePlay Flow,
+user presses start game,
+client connects to the server,
+server selects at random one of the 4 files,
+server sends number of words to the client,
+client disconnects from the server,
+client then guesses a word,
+client sends word to the server,
+server checks if its in the string or not.,
+gives the client a response depending on whether the word was inside or not,
+displays newly found words,
+client checks if full game is over,
+game ends,
+game asks to replay or end,
+client closes,
 
 Client Protocol (should use some sort of number key system to make protocols easier to use ex: guess = 200)
 ____________________________
