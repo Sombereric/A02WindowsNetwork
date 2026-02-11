@@ -43,7 +43,7 @@ Logic
 start game connects the client to the server.
 config button to change ip and such
 
-Four files
+# Four files
 ___
         File                          #1
         30 Character String           helpleasetsetablenjoyablendads
@@ -89,7 +89,8 @@ game ends,
 game asks to replay or end,
 client closes,
 
-Client Protocol (should use some sort of number key system to make protocols easier to use ex: guess = 200)
+# Client Protocol 
+(should use some sort of number key system to make protocols easier to use ex: guess = 200)
 ___
         Request                 Login
         Protocol ID             200
@@ -177,7 +178,7 @@ Server Statebag (what is stored to determine a game state for a certain user)
 -Start Timer
 -file user is playing on
 
-CheckList
+# CheckList
 File structure
 connection between client and server
     protocol

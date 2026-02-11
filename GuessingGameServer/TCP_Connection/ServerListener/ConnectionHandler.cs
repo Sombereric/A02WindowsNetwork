@@ -11,6 +11,7 @@ using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using GuessingGameServer.GameLogic;
 using GuessingGameServer.UserInterface;
 
 namespace GuessingGameServer.TCP_Connection.ServerListener
@@ -28,7 +29,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// <summary>
         /// where the server listens for connecting clients
         /// </summary>
-        public void MainServerListener()
+        public async Task MainServerListener(List<GameStateInfo> gameStateInfos)
         {
             //gets the server port and IP from the config file
             string ServerIP = ConfigurationManager.AppSettings["ServerIP"];

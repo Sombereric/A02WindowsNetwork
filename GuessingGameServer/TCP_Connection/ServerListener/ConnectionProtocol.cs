@@ -1,8 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*
+* FILE : ConnectionProtocol.cs
+* PROJECT : PROG2126 - Assignment #2
+* PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
+* FIRST VERSION : 2026-2-9
+* DESCRIPTION :
+* handles each request made by the client to the server and the respective action
+*/
+
+using GuessingGameServer.GameLogic;
 
 namespace GuessingGameServer.TCP_Connection.ServerListener
 {
@@ -13,9 +18,8 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         public void ServerProtocolManager(string[] protocolMessage)
         {
             //protocol Message format  Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
-            switch (protocolMessage[0]) 
-            {
-                
+            switch (protocolMessage[0])
+            { 
                 case "200": //client login
                     //creates state bag and picks a random file
                     //each one of these will have the proper function call for the data that they should get

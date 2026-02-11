@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace GuessingGameServer.GameLogic
 {
-    internal class GameState
+    internal class GameStateInfo
     {
         //Game States unique id
-        Guid ClientGuid;
+        public Guid ClientGuid;
 
         //clients port and ip used to allow the server to communicate with players
         public IPAddress ClientIp;
@@ -21,6 +21,9 @@ namespace GuessingGameServer.GameLogic
         public int GameFile;
         public List<string> TotalWordsToFind = new List<string>();
         public List<string> TotalWordsFound = new List<string>();
+
+        //allows multiple game states to be edited at once but not multiple edits to one game state
+        public readonly object GameStateLocker = new object();
         /// <summary>
         /// checks if a guessed word is already found or not
         /// </summary>
@@ -84,7 +87,10 @@ namespace GuessingGameServer.GameLogic
         /// <param name="GuessedWord">the word to add</param>
         public void AddToWordsFound(string GuessedWord)
         {
-            TotalWordsFound.Add(GuessedWord);
+            lock (GameStateLocker)
+            {
+                TotalWordsFound.Add(GuessedWord);
+            }
             return;
         }
     }
