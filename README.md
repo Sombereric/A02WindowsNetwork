@@ -45,41 +45,34 @@ config button to change ip and such
 
 Four files
 ____________________________
-File #1
-    Line 1: helpleasetsetablenjoyablendads
-    Line 2: 16 words
-    left to right
-        help
-        plea
-        please
-        set
-        sets
-        table
-        len
-        joy
-        enjoyable
-        enjoy
-        able
-        end
-        blend
-        dad
-        dads
-    right to left
-        bat
-        test
-____________________________
-File #2
-    Line 1: 
-    Line 2:
-____________________________
-File #3
-    Line 1: 
-    Line 2:
-____________________________
-file #4
-    Line 1: 
-    Line 2:
+        File                          #1
+        30 Character String           helpleasetsetablenjoyablendads
+        Number of words to find       16 words
 
+        left to right:                help, plea, please, set, sets, table, len, joy, enjoyable, enjoy, able, end, blend, dad, dads
+        right to left:                bat, test
+____________________________
+        File                          #2
+        30 Character String           
+        Number of words to find       
+
+        left to right:                
+        right to left:                
+____________________________
+        File                          #3
+        30 Character String           
+        Number of words to find       
+
+        left to right:                
+        right to left:    
+____________________________
+        File                          #4
+        30 Character String           
+        Number of words to find       
+
+        left to right:                
+        right to left:    
+____________________________
 GamePlay Flow
 user presses start game
 client connects to the server
@@ -142,9 +135,17 @@ ____________________________
         Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
         Example:                203|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Quit Game|-|END|
 ____________________________
-    Play Again:
-      
+        Request                 Play Again
+        Protocol ID             204
+        Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
+        Time Sent               2024-23-23
+        Action                  Play Again
+        Action Data             -
+        END                     |END|
 
+        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
+        Example:                203|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Play Again|-|END|
+____________________________
 
 
       -Server sends: 
