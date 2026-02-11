@@ -165,8 +165,6 @@ Server Protocol
     Server Going down:
         -server being shut down for whatever reason
 
-    
-
 Server Statebag (what is stored to determine a game state for a certain user)
 
 -Client Ip, Port
