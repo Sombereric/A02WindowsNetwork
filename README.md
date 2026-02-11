@@ -127,7 +127,7 @@ ____________________________
         Action                  New Game
         Action Data             -
         END                     |END|
-____________________________
+
         Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
         Example:                202|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|New Game|-|END|
 ____________________________
