@@ -44,7 +44,7 @@ start game connects the client to the server.
 config button to change ip and such
 
 Four files
-
+____________________________
 File #1
     Line 1: helpleasetsetablenjoyablendads
     Line 2: 16 words
@@ -67,15 +67,15 @@ File #1
     right to left
         bat
         test
-
+____________________________
 File #2
     Line 1: 
     Line 2:
-
+____________________________
 File #3
     Line 1: 
     Line 2:
-
+____________________________
 file #4
     Line 1: 
     Line 2:
