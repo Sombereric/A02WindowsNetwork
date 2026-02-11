@@ -209,30 +209,25 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                         finishRead = true;
                     }
                 }
-
-                //protocol v1
-                //data should be sent as a formatted string
-                //protocol format:  PROTOCOLID|USERNAME|PASSWORD|IP|PORT|END|
-                //protocol example: 200|eric|pass123|127.0.0.1|5000|END|
-
-                //protocol v3
                 /*  Request                     login, word guess, new game, quit game, play again
                         Protocol ID             200
                         Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
                         Time Sent               2024-23-23
                         Action                  Login
                         Action Data             username:password:ip:port
-                        END                     END
+                        END                     |END|
 
-                        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END
+                        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
                         Example:                200|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Login|username:password:ip:port|END|
                 */
 
                 char delimiter = '|';
                 string[] protocolMessage = checkMessage.Split(delimiter);
 
-                //check if protocol message has the right number of items
-                connectionProtocol.ServerProtocolManager(protocolMessage);
+                if (protocolMessage.Length != 6)
+                {
+                    connectionProtocol.ServerProtocolManager(protocolMessage);
+                }
 
                 //server response
 
