@@ -209,18 +209,6 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                         finishRead = true;
                     }
                 }
-                /*  Request                     login, word guess, new game, quit game, play again
-                        Protocol ID             200
-                        Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
-                        Time Sent               2024-23-23
-                        Action                  Login
-                        Action Data             username:password:ip:port
-                        END                     |END|
-
-                        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
-                        Example:                200|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Login|username:password:ip:port|END|
-                */
-
                 char delimiter = '|';
                 string[] protocolMessage = checkMessage.Split(delimiter);
 

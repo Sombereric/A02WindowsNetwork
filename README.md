@@ -97,42 +97,64 @@ game asks to replay or end
 client closes
 
 Client Protocol (should use some sort of number key system to make protocols easier to use ex: guess = 200)
-    Server Online: 
-        -Client Sends:
-            sends protocol id
-            sends login info
-            sends IP and port
-            Format                  Ex: 
-                PROTOCOL ID         200
-                USERNAME            eric
-                PASSWORD            pass123
-                IP                  127.0.0.1
-                PORT                5000
-                END (used to tell the reader they have read it all)
-        -Server sends:
-            server state
-            Format                  Ex:
-                PROTOCOL ID         200
-                SERVER STATE        200
-                MESSAGE             explains server status
-                END (used to tell the reader they have read it all)
-    Guess:
-        -Client Sends
-        -Server sends
-        -client sends a word to the server as a guess
-        -server must respond with a correct guess or wrong guess with updated list of all guessed words and timer
-    New Game:
-        -client presses new game
-        -tells the server to create a new game state and adds to the list
-        -server responses with a code to tell the client if the server succeeded in creating the game state
-    Quit Game:
-        -users quits or hits the exit button in the wpf
-        -tells the server to delete the state session stored into a list
-        -server deletes state and responses to the client with the successful deletion and removes ip and port from list as well
+____________________________
+        Request                 Login
+        Protocol ID             200
+        Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
+        Time Sent               2024-23-23
+        Action                  Login
+        Action Data             username:password:ip:port
+        END                     |END|
+
+        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
+        Example:                200|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Login|username:password:ip:port|END|
+____________________________
+        Request                 Guess
+        Protocol ID             201
+        Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
+        Time Sent               2024-23-23
+        Action                  Guess
+        Action Data             Hello (this is the word they guessed)
+        END                     |END|
+
+        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
+        Example:                201|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Guess|Hello|END|
+____________________________
+        Request                 New Game
+        Protocol ID             202
+        Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
+        Time Sent               2024-23-23
+        Action                  New Game
+        Action Data             -
+        END                     |END|
+____________________________
+        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
+        Example:                202|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|New Game|-|END|
+____________________________
+        Request                 Quit Game
+        Protocol ID             203
+        Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
+        Time Sent               2024-23-23
+        Action                  Quit Game
+        Action Data             -
+        END                     |END|
+
+        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
+        Example:                203|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Quit Game|-|END|
+____________________________
     Play Again:
-        -user selects play again
-        -replaces the stat with the new file
-        -server sends the newly sent up game state
+      
+
+
+
+      -Server sends: 
+      server state Format 
+      Ex: 
+      PROTOCOL ID 200 
+      SERVER STATE 200 
+      MESSAGE explains server status 
+      END (used to tell the reader they have read it all)
+
 
 Server Protocol
     Timer Run out:
