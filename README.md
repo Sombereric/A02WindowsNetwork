@@ -152,7 +152,7 @@ ___
         Game Related Data       Data on the game. word list 30 string character ect
         END                     |END|
 
-        example
+        example                 Guess protocol response
         Response ID             200
         Server State            No Errors Detected
         Game Related Data       word1,word2,word3,word4...
