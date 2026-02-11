@@ -44,105 +44,126 @@ start game connects the client to the server.
 config button to change ip and such
 
 Four files
+___
+        File                          #1
+        30 Character String           helpleasetsetablenjoyablendads
+        Number of words to find       16 words
 
-File #1
-    Line 1: helpleasetsetablenjoyablendads
-    Line 2: 16 words
-    left to right
-        help
-        plea
-        please
-        set
-        sets
-        table
-        len
-        joy
-        enjoyable
-        enjoy
-        able
-        end
-        blend
-        dad
-        dads
-    right to left
-        bat
-        test
+        left to right:                help, plea, please, set, sets, table, len, joy, enjoyable, enjoy, able, end, blend, dad, dads
+        right to left:                bat, test
+___
+        File                          #2
+        30 Character String           
+        Number of words to find       
 
-File #2
-    Line 1: 
-    Line 2:
+        left to right:                
+        right to left:                
+___
+        File                          #3
+        30 Character String           
+        Number of words to find       
 
-File #3
-    Line 1: 
-    Line 2:
+        left to right:                
+        right to left:    
+___
+        File                          #4
+        30 Character String           
+        Number of words to find       
 
-file #4
-    Line 1: 
-    Line 2:
-
-GamePlay Flow
-user presses start game
-client connects to the server
-server selects at random one of the 4 files
-server sends number of words to the client
-client disconnects from the server
-client then guesses a word
-client sends word to the server
-server checks if its in the string or not.
-gives the client a response depending on whether the word was inside or not
-displays newly found words
-client checks if full game is over
-game ends
-game asks to replay or end
-client closes
+        left to right:                
+        right to left:    
+___
+GamePlay Flow,
+user presses start game,
+client connects to the server,
+server selects at random one of the 4 files,
+server sends number of words to the client,
+client disconnects from the server,
+client then guesses a word,
+client sends word to the server,
+server checks if its in the string or not.,
+gives the client a response depending on whether the word was inside or not,
+displays newly found words,
+client checks if full game is over,
+game ends,
+game asks to replay or end,
+client closes,
 
 Client Protocol (should use some sort of number key system to make protocols easier to use ex: guess = 200)
-    Server Online: 
-        -Client Sends:
-            sends protocol id
-            sends login info
-            sends IP and port
-            Format                  Ex: 
-                PROTOCOL ID         200
-                USERNAME            eric
-                PASSWORD            pass123
-                IP                  127.0.0.1
-                PORT                5000
-                END (used to tell the reader they have read it all)
-        -Server sends:
-            server state
-            Format                  Ex:
-                PROTOCOL ID         200
-                SERVER STATE        200
-                MESSAGE             explains server status
-                END (used to tell the reader they have read it all)
-    Guess:
-        -Client Sends:
+___
+        Request                 Login
+        Protocol ID             200
+        Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
+        Time Sent               2024-23-23
+        Action                  Login
+        Action Data             username:password:ip:port
+        END                     |END|
 
-        -Server sends:
+        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
+        Example:                200|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Login|username:password:ip:port|END|
+___
+        Request                 Guess
+        Protocol ID             201
+        Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
+        Time Sent               2024-23-23
+        Action                  Guess
+        Action Data             Hello (this is the word they guessed)
+        END                     |END|
 
-        -client sends a word to the server as a gues-
-        -server must respond with a correct guess or wrong guess with updated list of all guessed words and timer
-    New Game:
-        -client presses new game
-        -tells the server to create a new game state and adds to the list
-        -server responses with a code to tell the client if the server succeeded in creating the game state
-    Quit Game:
-        -users quits or hits the exit button in the wpf
-        -tells the server to delete the state session stored into a list
-        -server deletes state and responses to the client with the successful deletion and removes ip and port from list as well
-    Play Again:
-        -user selects play again
-        -replaces the stat with the new file
-        -server sends the newly sent up game state
+        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
+        Example:                201|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Guess|Hello|END|
+___
+        Request                 New Game
+        Protocol ID             202
+        Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
+        Time Sent               2024-23-23
+        Action                  New Game
+        Action Data             -
+        END                     |END|
+
+        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
+        Example:                202|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|New Game|-|END|
+___
+        Request                 Quit Game
+        Protocol ID             203
+        Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
+        Time Sent               2024-23-23
+        Action                  Quit Game
+        Action Data             -
+        END                     |END|
+
+        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
+        Example:                203|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Quit Game|-|END|
+___
+        Request                 Play Again
+        Protocol ID             204
+        Client GUID             ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf
+        Time Sent               2024-23-23
+        Action                  Play Again
+        Action Data             -
+        END                     |END|
+
+        Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
+        Example:                204|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Play Again|-|END|
+___
+        Response                server respoonse layout
+        response ID             200 (means okay)
+        Server State            Message explaining server state
+        Game Related Data       Data on the game. word list 30 string character ect
+        END                     |END|
+
+        example                 Guess protocol response
+        Response ID             200
+        Server State            No Errors Detected
+        Game Related Data       word1,word2,word3,word4...
+        END                     |END|
+___
 
 Server Protocol
     Timer Run out:
         -a game over of sorts
     Server Going down:
         -server being shut down for whatever reason
-
-    
 
 Server Statebag (what is stored to determine a game state for a certain user)
 

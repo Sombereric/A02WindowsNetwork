@@ -175,33 +175,27 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         {
             NetworkStream stream = client.GetStream();
             string checkMessage = "";
+
+            bool finishRead = false;
+            int bufferSizeDefault = 1024;
+
+            string checkBuffer = ConfigurationManager.AppSettings["BufferSizeBytes"];
+
+            //attempts the parse the buffer size in the config file
+            if (!int.TryParse(checkBuffer, out int bufferSize))
+            {
+                ui.WriteToConsole("Failed to parse buffer in app.config using default of 1024.");
+                bufferSize = bufferSizeDefault;
+            }
+
+            byte[] buffer = new byte[bufferSize];
+
             try
             {
-                bool finishRead = false;
-
-                while (!finishRead && !cts.IsCancellationRequested && client.Connected)
+                while (!finishRead && !cts.IsCancellationRequested)
                 {
-                    string checkBuffer = ConfigurationManager.AppSettings["BufferSizeBytes"];
-
-                    //attempts the parse the buffer size in the config file
-                    if (!int.TryParse(checkBuffer, out int bufferSize))
-                    {
-                        ui.WriteToConsole("Failed to parse buffer in app.config");
-                    }
-
-                    byte[] buffer = new byte[bufferSize];
-
                     int bytesRead = 0;
-
-                    //handles any failures
-                    try
-                    {
-                        bytesRead = await stream.ReadAsync(buffer, 0, bufferSize, cts.Token);
-                    }
-                    catch (Exception ex)
-                    {
-                        ui.WriteToConsole(ex.ToString());
-                    }
+                    bytesRead = await stream.ReadAsync(buffer, 0, bufferSize, cts.Token);
 
                     if (bytesRead == 0)
                     {
@@ -209,17 +203,21 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     }
 
                     //IMPORTANT: decode only what was read
-                    checkMessage += Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
+                    checkMessage += Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    if (checkMessage.Contains("|END|"))
+                    {
+                        finishRead = true;
+                    }
                 }
-
-                //data should be sent as a formated string
-                //protocol format:  PROTOCOLID|USERNAME|PASSWORD|IP|PORT
-                //protocol example: 200|eric|pass123|127.0.0.1|5000
-
                 char delimiter = '|';
                 string[] protocolMessage = checkMessage.Split(delimiter);
 
-                connectionProtocol.ServerProtocolManager(protocolMessage);
+                if (protocolMessage.Length != 6)
+                {
+                    connectionProtocol.ServerProtocolManager(protocolMessage);
+                }
+
+                //server response
 
             }
             catch (Exception ex)
@@ -236,7 +234,6 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     clients.Remove(client);
                 }
             }
-
             return;
         }
     }

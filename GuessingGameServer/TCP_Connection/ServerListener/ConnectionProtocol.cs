@@ -12,18 +12,30 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         //this is what will be turned into a task to allow for multiple connections at once 
         public void ServerProtocolManager(string[] protocolMessage)
         {
+            //protocol Message format  Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
             switch (protocolMessage[0]) 
             {
-                //as an example. could be start game 
-                case "200":
+                
+                case "200": //client login
                     //creates state bag and picks a random file
                     //each one of these will have the proper function call for the data that they should get
                     //for example this will handle the guid and other such items
                     //check the read.me for the details of each protocol
                     break;
-                case "201":
+                case "201": //new game
+                    
+                    break;
+                case "202": //Guess
                     //could be guess made and calls the correct files
-                    guessMade("Help");
+                    guessMade(protocolMessage[3]);
+                    break;
+                case "203": //Play Game
+                    
+                    break;
+                case "204": //Quit Game
+                    
+                    break;
+                default: 
                     break;
             }
             return;
