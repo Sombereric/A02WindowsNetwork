@@ -89,7 +89,8 @@ game ends,
 game asks to replay or end,
 client closes,
 
-# Client Protocol (should use some sort of number key system to make protocols easier to use ex: guess = 200)
+# Client Protocol 
+(should use some sort of number key system to make protocols easier to use ex: guess = 200)
 ___
         Request                 Login
         Protocol ID             200
