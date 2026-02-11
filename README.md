@@ -117,11 +117,9 @@ Client Protocol (should use some sort of number key system to make protocols eas
                 MESSAGE             explains server status
                 END (used to tell the reader they have read it all)
     Guess:
-        -Client Sends:
-
-        -Server sends:
-
-        -client sends a word to the server as a gues-
+        -Client Sends
+        -Server sends
+        -client sends a word to the server as a guess
         -server must respond with a correct guess or wrong guess with updated list of all guessed words and timer
     New Game:
         -client presses new game
