@@ -4,13 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClientUI
+namespace ClientUI.DAL
 {
-    class RunTheClient
+    internal class ClientConfigLoader
     {
-        static void Main(string[] args)
-        {
-
-        }
     }
 }

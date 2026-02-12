@@ -1,4 +1,13 @@
-﻿using System;
+﻿/*
+* FILE : ClientConnection.cs
+* PROJECT : PROG2126 - Assignment #2
+* PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
+* FIRST VERSION : 2026-2-9
+* DESCRIPTION :
+* handles each request made by the client 
+*
+*/
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -9,11 +18,11 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualBasic;
+using ClientUI.Protocols;
 
-namespace ClientUI
+namespace ClientUI.TCP_Connection
 {
-    class NetWorkClient
+    class ClientConnection
     {
         private TcpClient tcpClient;
         private StreamReader reader;
@@ -103,7 +112,7 @@ namespace ClientUI
         {
             await ConnectTheClient(ip, port);
 
-            string checkMsg = Protocol.BuildMessage(fieldsDictionary);
+            string checkMsg = ClientProtocol.BuildMessage(fieldsDictionary);
 
             await SendMessage(checkMsg);
 
