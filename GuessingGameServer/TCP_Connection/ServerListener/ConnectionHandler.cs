@@ -29,7 +29,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// <summary>
         /// where the server listens for connecting clients
         /// </summary>
-        public async Task MainServerListener(List<GameStateInfo> gameStateInfos)
+        public async Task MainServerListener(List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
             //gets the server port and IP from the config file
             string ServerIP = ConfigurationManager.AppSettings["ServerIP"];
@@ -56,7 +56,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
                 ui.WriteToConsole("Server Listening on " + serverIPParsed.ToString() + ":" + port);
 
-                TaskRunner(server, gameStateInfos);
+                TaskRunner(server, gameStateInfos, GameStateLocker);
 
                 ui.WriteToConsole("To stop the server Press Enter...");
                 ui.ReadFromConsole();
@@ -127,7 +127,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// where the tasks are handed 
         /// </summary>
         /// <param name="server">the server clients connect to</param>
-        private void TaskRunner(TcpListener server, List<GameStateInfo> gameStateInfos)
+        private void TaskRunner(TcpListener server, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
             //accept loop on a task so console can stop server
             Task.Run(() =>
@@ -137,7 +137,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     while (!cts.Token.IsCancellationRequested)
                     {
                         ui.WriteToConsole("Server connection begun");
-                        serverClientWorker(server, gameStateInfos);
+                        serverClientWorker(server, gameStateInfos, GameStateLocker);
                     }
                 }
                 catch (Exception ex)
@@ -150,7 +150,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// where the work is actually done on the server side
         /// </summary>
         /// <param name="server">the name of the server listening</param>
-        private void serverClientWorker(TcpListener server, List<GameStateInfo> gameStateInfos)
+        private void serverClientWorker(TcpListener server, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
             TcpClient client = server.AcceptTcpClient();
 
@@ -164,7 +164,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             try
             {
                 //where the tasks are created to handle
-                Task clientHandlerTask = Task.Run(async () => await ConnectionClientHandler(client, gameStateInfos));
+                Task clientHandlerTask = Task.Run(async () => await ConnectionClientHandler(client, gameStateInfos, GameStateLocker));
             }
             catch (Exception ex)
             {
@@ -172,7 +172,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             }
             return;
         }
-        private async Task ConnectionClientHandler(TcpClient client, List<GameStateInfo> gameStateInfos)
+        private async Task ConnectionClientHandler(TcpClient client, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
             NetworkStream stream = client.GetStream();
             string checkMessage = "";
@@ -215,7 +215,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
                 if (protocolMessage.Length != 6)
                 {
-                    connectionProtocol.ServerProtocolManager(protocolMessage, gameStateInfos);
+                    connectionProtocol.ServerProtocolManager(protocolMessage, gameStateInfos, GameStateLocker);
                 }
 
                 //server response

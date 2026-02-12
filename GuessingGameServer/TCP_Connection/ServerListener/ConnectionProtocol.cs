@@ -7,6 +7,7 @@
 * handles each request made by the client to the server and the respective action
 */
 
+using System.Net;
 using GuessingGameServer.GameLogic;
 
 namespace GuessingGameServer.TCP_Connection.ServerListener
@@ -15,16 +16,32 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
     {
         //code from protocol will be something from the client like 200, 300, something like that
         //this is what will be turned into a task to allow for multiple connections at once 
-        public void ServerProtocolManager(string[] protocolMessage, List<GameStateInfo> gameStateInfos)
+        public void ServerProtocolManager(string[] protocolMessage, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
             //protocol Message format  Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
             switch (protocolMessage[0])
             { 
                 case "200": //client login
+                    bool SuccessState = false;
+                    string[] parsedActionData;
                     //creates state bag and picks a random file
                     //each one of these will have the proper function call for the data that they should get
                     //for example this will handle the guid and other such items
                     //check the read.me for the details of each protocol
+
+                    GameStateInfo gameStateInfo = new GameStateInfo();
+
+                    if (Guid.TryParse(protocolMessage[1], out Guid clientGuid))
+                    {
+                        gameStateInfo.ClientGuid = clientGuid;
+                        SuccessState = true;
+                    }
+                    parsedActionData = ParseActionData(protocolMessage[4]);
+
+                    lock (GameStateLocker)
+                    {
+                        gameStateInfos.Add(gameStateInfo);
+                    }
                     break;
                 case "201": //new game
                     //help
@@ -49,6 +66,13 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         {
             //this would be where the guess is handled against the state bag. 
             //this is why state bags needs to be a class as to allow for us to create a list
+        }
+        private string[] ParseActionData(string actionData)
+        {
+            string[] parsedActionData = actionData.Split(':');
+
+
+            return parsedActionData;
         }
     }
 }

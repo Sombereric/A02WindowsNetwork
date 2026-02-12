@@ -101,7 +101,7 @@ ___
         END                     |END|
 
         Format:                 Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
-        Example:                200|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Login|username:password:ip:port|END|
+        Example:                200|ASDFAJIHEFRJW-234lkihgba0sdf-234zsdf|2024-23-23|Login|username:ip:port|END|
 ___
         Request                 Guess
         Protocol ID             201
