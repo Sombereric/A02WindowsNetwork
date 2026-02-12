@@ -15,7 +15,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
     {
         //code from protocol will be something from the client like 200, 300, something like that
         //this is what will be turned into a task to allow for multiple connections at once 
-        public void ServerProtocolManager(string[] protocolMessage)
+        public void ServerProtocolManager(string[] protocolMessage, List<GameStateInfo> gameStateInfos)
         {
             //protocol Message format  Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
             switch (protocolMessage[0])

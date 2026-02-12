@@ -18,12 +18,10 @@ namespace ClientUI.Protocols
             foreach (KeyValuePair<string, string> checkKey in checkDictionary)
             {
                 sb.AppendLine(checkKey.Key + ":"+ checkKey.Value);
-
             }
             sb.AppendLine("END");
 
             return sb.ToString();
-
        }
 
         /// <summary>
@@ -43,9 +41,6 @@ namespace ClientUI.Protocols
                 {
                     break;
                 }
-
-
-
                 string[] checkParts = lookLine.Split(':', 2);
 
                 if (checkParts.Length == 2)
@@ -55,12 +50,8 @@ namespace ClientUI.Protocols
 
                     checkFields[checkParts[0].Trim()] = checkParts[1].Trim();
                 }
-
             }
             return checkFields;
-
         }
-       
     }
-
 }
