@@ -27,7 +27,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     //check the read.me for the details of each protocol
                     break;
                 case "201": //new game
-                    
+                    //help
                     break;
                 case "202": //Guess
                     //could be guess made and calls the correct files
