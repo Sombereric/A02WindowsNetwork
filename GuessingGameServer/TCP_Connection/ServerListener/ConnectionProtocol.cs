@@ -31,12 +31,26 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
                     GameStateInfo gameStateInfo = new GameStateInfo();
 
+                    //reverse if statements as one can fail but still pass
+                    //add locker to each thing as it should only be allowed to do one at a time
                     if (Guid.TryParse(protocolMessage[1], out Guid clientGuid))
                     {
                         gameStateInfo.ClientGuid = clientGuid;
                         SuccessState = true;
                     }
                     parsedActionData = ParseActionData(protocolMessage[4]);
+
+                    if (IPAddress.TryParse(parsedActionData[1], out IPAddress clientIP))
+                    {
+                        gameStateInfo.ClientIp = clientIP;
+                        SuccessState = true;
+                    }
+
+                    if (Int32.TryParse(parsedActionData[2], out Int32 clientPort))
+                    {
+                        gameStateInfo.Port = clientPort;
+                        SuccessState = true;
+                    }
 
                     lock (GameStateLocker)
                     {
