@@ -16,13 +16,15 @@ class CLientRunner
            ClientConnection  networkClient = new ClientConnection();
            ClientSessionGame session = new ClientSessionGame();
 
+        Console.WriteLine("what nigga");
+
             bool isRunning = true;
 
-            if(isRunning )
-            {
+            //if(isRunning )
+            //{
                
 
-            }
+            //}
         }
     }
 

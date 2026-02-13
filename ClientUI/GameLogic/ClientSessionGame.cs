@@ -151,43 +151,7 @@ namespace ClientUI.GameLogic
 
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="checkWord"></param>
-        public void TryAddGuess(string checkWord)
-        {   
-            bool pleaseExit = false;
-
-            string normalizedTheWord = string.Empty;
-
-            if (checkWord == null)
-            {
-                pleaseExit = true;
-            }
-            else
-            {
-                normalizedTheWord = checkWord.Trim().ToLower();
-
-                if (normalizedTheWord.Length == 0)
-                {
-                    pleaseExit = true;
-                }
-
-                else if (guessWordList.Contains(normalizedTheWord) == true)
-                {
-                    pleaseExit = true;
-
-                }
-            }
-
-            if(pleaseExit == false)
-            {
-                guessWordList.Add(normalizedTheWord);
-            }
-
-            return;
-        }
+      
 
         /// <summary>
         /// 
