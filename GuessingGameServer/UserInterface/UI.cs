@@ -21,7 +21,7 @@ namespace GuessingGameServer.UserInterface
             return;
         }
         /// <summary>
-        /// 
+        /// reads input from console
         /// </summary>
         public void ReadFromConsole()
         {

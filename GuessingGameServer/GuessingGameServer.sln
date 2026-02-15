@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36705.20 d17.14
+VisualStudioVersion = 17.14.36705.20
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuessingGameServer", "GuessingGameServer.csproj", "{DE249535-ADAF-406C-AB23-A153B3D33E02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuessingGameClient", "..\GuessingGameClient\GuessingGameClient.csproj", "{F5B88AD9-A985-C4D4-21FD-8DA8F2B37014}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{DE249535-ADAF-406C-AB23-A153B3D33E02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE249535-ADAF-406C-AB23-A153B3D33E02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE249535-ADAF-406C-AB23-A153B3D33E02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5B88AD9-A985-C4D4-21FD-8DA8F2B37014}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5B88AD9-A985-C4D4-21FD-8DA8F2B37014}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5B88AD9-A985-C4D4-21FD-8DA8F2B37014}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5B88AD9-A985-C4D4-21FD-8DA8F2B37014}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

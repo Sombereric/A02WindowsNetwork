@@ -19,6 +19,7 @@ namespace GuessingGameServer.GameLogic
         //game Stats
         public int NumberOfWordsLeft;
         public int GameFile;
+        public DateTime GameStart;
         public List<string> TotalWordsToFind = new List<string>();
         public List<string> TotalWordsFound = new List<string>();
 
