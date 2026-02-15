@@ -10,7 +10,7 @@ using ClientUI.Protocols;
 
 namespace ClientUI.DAL.ClientManager
 {
-    internal class ClientWorker
+    public class ClientWorker
     {
         public static async Task <string> Run(int protocolId)
         {
