@@ -8,5 +8,9 @@ namespace GuessingGameServer.GameLogic
 {
     internal class GameGuesser
     {
+        public static void CheckGuess(GameStateInfo gameState)
+        {
+
+        }
     }
 }
