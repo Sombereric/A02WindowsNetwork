@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -22,6 +23,10 @@ namespace GuessingGameServer.GameLogic
         public DateTime GameStart;
         public List<string> TotalWordsToFind = new List<string>();
         public List<string> TotalWordsFound = new List<string>();
+
+        // timer to stop the game
+        public Stopwatch GameStopwatch;
+        public int TimeLimitSeconds;
 
         //allows multiple game states to be edited at once but not multiple edits to one game state
         public readonly object GameStateLocker = new object();

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClientUI.DAL
+namespace ClientUI.TCP_Connection
 {
-    internal class ClientConfigLoader
+    internal class ConnectionHandlerClient
     {
     }
 }

@@ -1,71 +1,77 @@
-﻿/*
-* FILE : FileLoader.cs
-* PROJECT : PROG2126 - Assignment #1
-* PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
-* FIRST VERSION : 2026-1-25
-* DESCRIPTION :
-* Where the game file is loaded for the game
-*/
-
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
-using GuessingGameServer.UserInterface;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace GuessingGameServer.DAL
 {
     internal class fileLoader
     {
-        UI uI = new UI();
 
-        private string filePath;
-        private static readonly object locker = new object();
-        
-        public string[] fileReader(int fileToLoad)
+        private static readonly string filePath = ConfigurationManager.AppSettings["FilePath"];
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static GameFileData LoadRandomGame()
         {
-            string[] gameData;
-            string gameFileData = "";
+            string[] gameFiles = { "game1.txt", "game2.txt", "game3.txt", "game4.txt"};
 
-            switch (fileToLoad)
+            Random random = new Random();
+
+            int randomIndex = random.Next(gameFiles.Length);
+
+            string selectedFile = Path.Combine(filePath, gameFiles[randomIndex]); // combine file
+
+            return LoadGameFile(selectedFile);
+
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <exception cref="Exception"></exception>
+        public static GameFileData? LoadGameFile(string filePath)
+        {
+            if (!File.Exists(filePath))
             {
-                case 0:
-                    filePath = ConfigurationManager.AppSettings["GameFile1"];
-                    break;
-                case 1:
-                    filePath = ConfigurationManager.AppSettings["GameFile2"];
-                    break;
-                case 2:
-                    filePath = ConfigurationManager.AppSettings["GameFile3"];
-                    break;
-                case 3:
-                    filePath = ConfigurationManager.AppSettings["GameFile4"];
-                    break;
-                default:
-                    break;
+                return null;
             }
 
-           StreamReader reader = new StreamReader(filePath);
-        
-            lock (locker)
+            string[] checkLine = File.ReadAllLines(filePath);
+
+            int underLength = 3; // made sure the minium is 3 for the lines
+
+            if(checkLine.Length < underLength)
             {
-                try
+                return null;
+            }
+
+            string checkSentence = checkLine[0].Trim();
+
+            int totalWords = int.Parse(checkLine[1]);
+
+            List<string> wordsList = new List<string>();
+
+            int wordStart = 2; // this will start the index number made sure i started at 2
+            
+            for (int checkCount = wordStart; checkCount < checkLine.Length; checkCount++)
+            {
+                string checkWord = checkLine[checkCount].Trim();
+
+                if (checkWord.Length > 0)
                 {
-                    gameFileData = reader.ReadToEnd();
-                }
-                catch (Exception ex)
-                {
-                    uI.WriteToConsole(ex.Message);
-                }
-                finally
-                {
-                    if (reader != null)
-                    {
-                        reader.Close();
-                    } 
+                    wordsList.Add(checkWord);
                 }
             }
 
-            gameData = gameFileData.Split('|');
-
-            return gameData;
+            return new GameFileData(checkSentence, totalWords, wordsList);
         }
     }
 }
