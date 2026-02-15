@@ -1,0 +1,23 @@
+﻿<Window x:Class="GuessingGameClient.UIGamePage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GuessingGameClient"
+        mc:Ignorable="d"
+        Title="UIGamePage" Height="450" Width="800">
+    <Grid RenderTransformOrigin="0.496,0.483">
+        <TextBox x:Name="GuessBox" HorizontalAlignment="Center" FontSize="30" Margin="0,129,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="250" RenderTransformOrigin="-0.038,0.679"/>
+        <Button x:Name="AboutBtn" Content="ABOUT" HorizontalAlignment="Left" Margin="45,37,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.286,-0.395"/>
+        <Button x:Name="QuitBtn" Content="QUIT GAME" HorizontalAlignment="Left" Margin="691,37,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="SubmitBtn" Content="SUBMIT" FontSize="25" HorizontalAlignment="Left" Margin="549,361,0,0" VerticalAlignment="Top" RenderTransformOrigin="5.95,0.638"/>
+        <TextBox x:Name="StringDisplayTB" HorizontalAlignment="Center" FontSize="25" Margin="0,266,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="250" RenderTransformOrigin="-0.123,0.702"/>
+        <TextBox HorizontalAlignment="Center" FontSize="30" Margin="0,359,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="250" RenderTransformOrigin="0.285,0.456"/>
+        <TextBox HorizontalAlignment="Left" FontSize="25" Margin="168,362,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="91" RenderTransformOrigin="-0.416,0.388"/>
+        <Label x:Name="TitleLbl" Content="Linearion" FontSize="40" HorizontalAlignment="Center" Margin="0,15,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.102,-0.955"/>
+        <Label x:Name="GuessStringLbl" Content="String to guess from " HorizontalAlignment="Center" Margin="0,98,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.62,0.652"/>
+        <Label x:Name="WordCountLbl" Content="Remaining word count" HorizontalAlignment="Center" Margin="0,235,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.494,-0.688"/>
+        <Label x:Name="RemainingTimeLbl" Content="Remaining Time:" HorizontalAlignment="Left" Margin="168,331,0,0" VerticalAlignment="Top" Height="26" Width="105"/>
+
+    </Grid>
+</Window>
