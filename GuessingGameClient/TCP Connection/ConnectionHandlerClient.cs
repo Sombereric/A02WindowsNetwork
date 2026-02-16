@@ -8,10 +8,7 @@ namespace ClientUI.TCP_Connection
 {
     internal class ConnectionHandlerClient
     {
-<<<<<<< HEAD
 
        
-=======
->>>>>>> Erics_devBranch
     }
 }
