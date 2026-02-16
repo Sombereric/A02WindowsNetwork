@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -10,6 +11,7 @@ namespace GuessingGameServer.TCP_Connection.ServerSender
 {
     internal class ServerClientSender
     {
+
         /// <summary>
         ///  this will just the response from the client to the server
         /// </summary>
@@ -51,4 +53,6 @@ namespace GuessingGameServer.TCP_Connection.ServerSender
         
             
      }
-}
+     
+    }
+
