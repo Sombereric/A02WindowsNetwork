@@ -18,8 +18,10 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
     {
         //code from protocol will be something from the client like 200, 300, something like that
         //this is what will be turned into a task to allow for multiple connections at once 
-        public void ServerProtocolManager(string[] protocolMessage, List<GameStateInfo> gameStateInfos, object GameStateLocker)
+        public string ServerProtocolManager(string[] protocolMessage, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
+            string serverResponseData = "";
+
             //protocol Message format  Protocol ID|Client GUID|Time Sent|Action|Action Data|END|
             switch (protocolMessage[0])
             {
@@ -50,7 +52,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     //check the read.me for the details of each protocol
                     break;
                 case "201": //guess game
-                    guessMade(gameStateInfos, protocolMessage[4], protocolMessage[1]);
+                    serverResponseData = guessMade(gameStateInfos, protocolMessage[4], protocolMessage[1]);
 
                     break;
                 case "202": //new game
@@ -65,7 +67,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 default:
                     break;
             }
-            return;
+            return serverResponseData; 
         }
 
         /// <summary>
@@ -74,20 +76,23 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// <param name="gameStateInfos"></param>
         /// <param name="guess"></param>
         /// <param name="clientGuid"></param>
-        private void guessMade(List<GameStateInfo> gameStateInfos, string guess, string clientGuid)
+        private string guessMade(List<GameStateInfo> gameStateInfos, string guess, string clientGuid)
         {
+            string ResponseID = "";
+            string ServerState = "";
+            string gameRelatedData = "";
+
             //this would be where the guess is handled against the state bag. 
             if (guess == null || guess.Trim().Length == 0)
             {
-                Console.WriteLine("Invalid Guess");
-                return;
+                gameRelatedData = "Invalid Guess";
             }
 
             Guid parsedGuid;
             if (!Guid.TryParse(clientGuid, out parsedGuid))
             {
-                Console.WriteLine("BAD REQUEST 3");
-                return;
+                ResponseID = "400";
+                ServerState = "Unable to Parse Guid";
             }
             GameStateInfo stateInfo = null;
 
@@ -103,8 +108,8 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             if (stateInfo == null)
             {
-                Console.WriteLine("BAD REQUEST 4");
-                return;
+                ResponseID = "400";
+                ServerState = "No state info found";
             }
 
             string cleanTheGuess = guess.Trim();
@@ -126,23 +131,29 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
                     if (stateInfo.NumberOfWordsLeft == 0)
                     {
-                        Console.WriteLine("WINNER");
-                        return;
+                        gameRelatedData = "WINNER";
                     }
 
-                    Console.WriteLine("FOUND");
+                    gameRelatedData = "FOUND";
 
                 }
                 else if (lookResult == 1)
                 {
-                    Console.WriteLine("NOT FOUND");
+                    gameRelatedData = "NOT FOUND";
 
                 }
                 else if (lookResult == 2)
                 {
-                    Console.WriteLine("ALREADY FOUND");
+                    gameRelatedData = "ALREADY FOUND";
                 }
             }
+
+            if (ResponseID.Length == 0)
+            {
+                ResponseID = "200";
+                ServerState = "Successful Guess";
+            }
+            return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
         }
 
         //this is why state bags needs to be a class as to allow for us to create a list
@@ -220,10 +231,6 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             Console.WriteLine("OK");
             return;
-
-
-
-
         }
 
         /// <summary>
@@ -296,12 +303,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     return;
                 }
             }
-
             Console.WriteLine("BAD REQUEST 13");
         }
-
-
-
-
     }
 }

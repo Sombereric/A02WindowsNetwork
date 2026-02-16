@@ -30,7 +30,7 @@ namespace GuessingGameClient
                 string checkResponse = await ClientWorker.Run(200, UserNameTB.Text);
                 UIGamePage uIGamePage = new UIGamePage();
 
-                this.Hide();
+                this.Close();
 
                 uIGamePage.Show();
             }
