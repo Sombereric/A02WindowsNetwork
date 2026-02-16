@@ -12,14 +12,19 @@ namespace ClientUI.DAL.ClientManager
 {
     public class ClientWorker
     {
-        public static async Task <string> Run(int protocolId)
+        public static async Task <string> Run(int protocolId, string userName)
         {
             string serverIp = ConfigurationManager.AppSettings["ServerIP"];
             string portText = ConfigurationManager.AppSettings["ServerPort"];
 
             bool checkOk = true;
 
-            int serverPort = 0;
+            if (Int32.TryParse(portText, out Int32 result))
+            {
+                //i died inside
+            }
+
+            int serverPort = result;
 
             string commandAction = string.Empty; // this will command the action for login
             string actionData = string.Empty; // this will send the data action
@@ -43,7 +48,7 @@ namespace ClientUI.DAL.ClientManager
                 {
                     case 200:
                         commandAction = "Login";
-                        actionData = "username: password" + serverIp + ":" + portText;
+                        actionData = "username" + ":" + userName + ":" + serverIp + ":" + portText;
                         break;
 
                     case 201:
@@ -128,16 +133,10 @@ namespace ClientUI.DAL.ClientManager
                         {
                             checkClient.Close();
                         }
-
                     }
-
                 }
-
             }
             return checkResponse.ToString();
-
         }
     }
 }
-
-    

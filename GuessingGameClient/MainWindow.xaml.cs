@@ -27,7 +27,7 @@ namespace GuessingGameClient
         {
             try
             {
-                string checkResponse = await ClientWorker.Run(200);
+                string checkResponse = await ClientWorker.Run(200, UserNameTB.Text);
                 MessageBox.Show(checkResponse);
             }
             catch (Exception ex)

@@ -10,6 +10,7 @@ namespace GuessingGameServer
         public readonly object GameStateLocker = new object();
         public async Task mainRunner() 
         {
+            Console.WriteLine("I cam");
             ConnectionHandler connectionHandler = new ConnectionHandler();
 
             await connectionHandler.MainServerListener(gameStatesInfo, GameStateLocker);
