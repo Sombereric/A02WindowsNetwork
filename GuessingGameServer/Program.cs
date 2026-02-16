@@ -1,17 +1,16 @@
-﻿using GuessingGameServer.UserInterface;
+﻿using System.Threading.Tasks;
+using GuessingGameServer.UserInterface;
 
 namespace GuessingGameServer
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             ServerMainRunner serverMainRunner = new ServerMainRunner();
             serverMainRunner.mainRunner();
 
-            UI uI = new UI();
-            Console.WriteLine(uI.ToString());
-
+            await serverMainRunner.mainRunner();
         }
     }
 }

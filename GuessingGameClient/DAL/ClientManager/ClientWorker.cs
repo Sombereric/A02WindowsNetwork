@@ -32,6 +32,11 @@ namespace ClientUI.DAL.ClientManager
 
             StringBuilder checkResponse = new StringBuilder();
 
+            if(!int.TryParse(portText, out serverPort))
+            {
+                checkOk = false;
+            }
+
             if (checkOk)
             {
                 switch (protocolId)
@@ -47,7 +52,7 @@ namespace ClientUI.DAL.ClientManager
                         break;
 
                     case 202:
-                        commandAction = "New Game";
+                        commandAction = "NewGame";
                         actionData = "-";
                         break;
 
@@ -57,7 +62,7 @@ namespace ClientUI.DAL.ClientManager
                         break;
 
                     case 204:
-                        commandAction = "Play Again";
+                        commandAction = "PlayAgain";
                         actionData = "-";
                         break;
 
@@ -73,7 +78,7 @@ namespace ClientUI.DAL.ClientManager
                     Guid clientGuid = Guid.NewGuid();
                     string timeSent = DateTime.UtcNow.ToString("o");
 
-                    checkRequst = protocolId.ToString() + "|" + clientGuid.ToString() + "|" + timeSent + "|" + timeSent + "|" + commandAction + "|" + actionData + "|END|";
+                    checkRequst = protocolId.ToString() + "|" + clientGuid.ToString() + "|" + timeSent + "|" + commandAction + "|" + actionData + "|END|";
 
                 }
 
@@ -83,6 +88,7 @@ namespace ClientUI.DAL.ClientManager
                     try
                     {
                         checkClient = new TcpClient();
+                        
                         await checkClient.ConnectAsync(serverIp, serverPort);
 
                         networkStream = checkClient.GetStream();
