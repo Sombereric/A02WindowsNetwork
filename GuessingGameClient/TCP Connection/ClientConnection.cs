@@ -7,17 +7,10 @@
 * handles each request made by the client 
 *
 */
-using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 using ClientUI.Protocols;
 
 namespace ClientUI.TCP_Connection
@@ -64,7 +57,6 @@ namespace ClientUI.TCP_Connection
         {
             string[] lookLines = lookMessage.Split(Environment.NewLine);
        
-
             foreach(string checkLine in lookLines)
             {
                 await writer.WriteLineAsync(checkLine);
@@ -132,12 +124,5 @@ namespace ClientUI.TCP_Connection
             writer?.Dispose();
             tcpClient.Close();
         }
-        
-
     }
-
-    
-    
-
-
 }

@@ -19,7 +19,12 @@ namespace ClientUI.DAL.ClientManager
 
             bool checkOk = true;
 
-            int serverPort = 0;
+            if (Int32.TryParse(portText, out Int32 result))
+            {
+                //i died inside
+            }
+
+            int serverPort = result;
 
             string commandAction = string.Empty; // this will command the action for login
             string actionData = string.Empty; // this will send the data action
@@ -73,7 +78,7 @@ namespace ClientUI.DAL.ClientManager
                     Guid clientGuid = Guid.NewGuid();
                     string timeSent = DateTime.UtcNow.ToString("o");
 
-                    checkRequst = protocolId.ToString() + "|" + clientGuid.ToString() + "|" + timeSent + "|" + timeSent + "|" + commandAction + "|" + actionData + "|END|";
+                    checkRequst = protocolId.ToString() + "|" + clientGuid.ToString() + "|" + timeSent + "|" + commandAction + "|" + actionData + "|END|";
 
                 }
 
@@ -122,16 +127,10 @@ namespace ClientUI.DAL.ClientManager
                         {
                             checkClient.Close();
                         }
-
                     }
-
                 }
-
             }
             return checkResponse.ToString();
-
         }
     }
 }
-
-    

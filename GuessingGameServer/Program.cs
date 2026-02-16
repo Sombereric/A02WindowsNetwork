@@ -11,7 +11,6 @@ namespace GuessingGameServer
 
             UI uI = new UI();
             Console.WriteLine(uI.ToString());
-
         }
     }
 }

@@ -33,13 +33,13 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
                     if (takeAction != "Login")
                     {
-                        Console.WriteLine("BAD REQUEST");
+                        Console.WriteLine("BAD REQUEST 1");
                         break;
                     }
 
                     if (endToken != "End")
                     {
-                        Console.WriteLine("BAD REQUEST");
+                        Console.WriteLine("BAD REQUEST 2");
                     }
 
                     Login(actionData, guidText, gameStateInfos);
@@ -86,7 +86,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             Guid parsedGuid;
             if (!Guid.TryParse(clientGuid, out parsedGuid))
             {
-                Console.WriteLine("BAD REQUEST");
+                Console.WriteLine("BAD REQUEST 3");
                 return;
             }
             GameStateInfo stateInfo = null;
@@ -103,7 +103,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             if (stateInfo == null)
             {
-                Console.WriteLine("BAD REQUEST");
+                Console.WriteLine("BAD REQUEST 4");
                 return;
             }
 
@@ -160,14 +160,14 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             if (userNamePasswordIpPort == null || userNamePasswordIpPort.Trim().Length == 0)
             {
-                Console.WriteLine("BAD REQUEST");
+                Console.WriteLine("BAD REQUEST 5");
                 return;
             }
 
             Guid parsedGuid;
             if (!Guid.TryParse(guidText, out parsedGuid))
             {
-                Console.WriteLine("BAD REQUEST");
+                Console.WriteLine("BAD REQUEST 6");
                 return;
             }
 
@@ -186,7 +186,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             if (checkParts.Length < 4)
             {
-                Console.WriteLine("BAD REQUEST");
+                Console.WriteLine("BAD REQUEST 7");
                 return;
             }
 
@@ -199,13 +199,13 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             if (!IPAddress.TryParse(ipText, out checkIP))
             {
-                Console.WriteLine("BAD REQUEST");
+                Console.WriteLine("BAD REQUEST 8");
                 return;
             }
 
             if(!int.TryParse(portText, out checkPort))
             {
-                Console.WriteLine("BAD REQUEST");
+                Console.WriteLine("BAD REQUEST 9");
                 return;
             }
 
@@ -236,7 +236,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             Guid parsedGuid;
             if (!Guid.TryParse(guidText, out parsedGuid))
             {
-                Console.WriteLine("BAD REQUEST");
+                Console.WriteLine("BAD REQUEST 10");
                 return;
             }
 
@@ -254,7 +254,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             if (stateInfo == null)
             {
-                Console.WriteLine("BAD REQUEST");
+                Console.WriteLine("BAD REQUEST 11");
                 return;
             }
 
@@ -283,7 +283,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             Guid parsedGuid;
             if (!Guid.TryParse(guidText, out parsedGuid))
             {
-                Console.WriteLine("BAD REQUEST");
+                Console.WriteLine("BAD REQUEST 12");
                 return;
             }
 
@@ -297,7 +297,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 }
             }
 
-            Console.WriteLine("BAD REQUEST");
+            Console.WriteLine("BAD REQUEST 13");
         }
 
 

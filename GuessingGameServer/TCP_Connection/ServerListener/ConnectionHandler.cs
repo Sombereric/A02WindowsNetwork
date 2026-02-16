@@ -31,8 +31,8 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// </summary>
         public async Task MainServerListener(List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
+            Console.WriteLine("I cam twice");
             //gets the server port and IP from the config file
-            string ServerIP = ConfigurationManager.AppSettings["ServerIP"];
             string ServerPort = ConfigurationManager.AppSettings["ServerPort"];
 
             TcpListener server = null;
@@ -43,18 +43,14 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 {
                     ui.WriteToConsole("Failure to parse server port");
                 }
-                if (!IPAddress.TryParse(ServerIP, out IPAddress serverIPParsed))
-                {
-                    ui.WriteToConsole("Failure to parse server IP");
-                }
 
                 //creates the listener
-                server = new TcpListener(serverIPParsed, port);
+                server = new TcpListener(IPAddress.Any, port);
 
                 //start listening for clients requests
                 server.Start();
 
-                ui.WriteToConsole("Server Listening on " + serverIPParsed.ToString() + ":" + port);
+                //ui.WriteToConsole("Server Listening on " + serverIPParsed.ToString() + ":" + port);
 
                 TaskRunner(server, gameStateInfos, GameStateLocker);
 
