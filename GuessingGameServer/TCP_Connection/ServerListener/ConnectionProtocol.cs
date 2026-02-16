@@ -53,16 +53,15 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     break;
                 case "201": //guess game
                     serverResponseData = guessMade(gameStateInfos, protocolMessage[4], protocolMessage[1]);
-
                     break;
                 case "202": //new game
-                    NewGame(gameStateInfos, protocolMessage[1]);
+                    serverResponseData = NewGame(gameStateInfos, protocolMessage[1]);
                     break;
                 case "203": //Play Game
-                    NewGame(gameStateInfos, protocolMessage[1]);
+                    serverResponseData = NewGame(gameStateInfos, protocolMessage[1]);
                     break;
                 case "204": //Quit Game
-                    QuitGame(gameStateInfos, protocolMessage[1]);
+                    serverResponseData = QuitGame(gameStateInfos, protocolMessage[1]);
                     break;
                 default:
                     break;
@@ -163,7 +162,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// <param name="guidText"></param>
         /// <param name="gameStateInfos"></param>
         /// <param name="actionData"></param>
-        private void Login(string userNamePasswordIpPort, string guidText, List<GameStateInfo> gameStateInfos)
+        private string Login(string userNamePasswordIpPort, string guidText, List<GameStateInfo> gameStateInfos)
         {
             string ResponseID = "";
             string ServerState = "";
@@ -171,25 +170,15 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             if (userNamePasswordIpPort == null || userNamePasswordIpPort.Trim().Length == 0)
             {
-                Console.WriteLine("BAD REQUEST 5");
-                return;
+                ResponseID = "400";
+                ServerState = "No Login Data Passed";
             }
 
             Guid parsedGuid;
             if (!Guid.TryParse(guidText, out parsedGuid))
             {
-                Console.WriteLine("BAD REQUEST 6");
-                return;
-            }
-
-            // this will check if the user already logged in
-            for (int checkCount = 0; checkCount < gameStateInfos.Count; checkCount++)
-            {
-                if (gameStateInfos[checkCount] != null && gameStateInfos[checkCount].ClientGuid == parsedGuid)
-                {
-                    Console.WriteLine("OK");
-                    return;
-                }
+                ResponseID = "400";
+                ServerState = "Unable to Parse Guid";
             }
 
             // split the login data
@@ -197,8 +186,8 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             if (checkParts.Length != 4)
             {
-                Console.WriteLine("BAD REQUEST 7");
-                return;
+                ResponseID = "400";
+                ServerState = "Invalid Action Data";
             }
 
 
@@ -206,18 +195,18 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             string portText = checkParts[3];
 
             IPAddress checkIP;
-            int checkPort;
+            Int32 checkPort;
 
             if (!IPAddress.TryParse(ipText, out checkIP))
             {
-                Console.WriteLine("BAD REQUEST 8");
-                return;
+                ResponseID = "400";
+                ServerState = "Invalid IP";
             }
 
-            if(!int.TryParse(portText, out checkPort))
+            if(!Int32.TryParse(portText, out checkPort))
             {
-                Console.WriteLine("BAD REQUEST 9");
-                return;
+                ResponseID = "400";
+                ServerState = "Invalid Port";
             }
 
             // create new game state object
@@ -229,8 +218,12 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             // add new state to list
             gameStateInfos.Add(newState);
 
-            Console.WriteLine("OK");
-            return;
+            if (ResponseID.Length == 0)
+            {
+                ResponseID = "200";
+                ServerState = "Successful Guess";
+            }
+            return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
         }
 
         /// <summary>
@@ -238,13 +231,17 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// </summary>
         /// <param name="gameStateInfos"></param>
         /// <param name="guidText"></param>
-        private void NewGame(List<GameStateInfo> gameStateInfos, string guidText)
+        private string NewGame(List<GameStateInfo> gameStateInfos, string guidText)
         {
+            string ResponseID = "";
+            string ServerState = "";
+            string gameRelatedData = "";
+
             Guid parsedGuid;
             if (!Guid.TryParse(guidText, out parsedGuid))
             {
-                Console.WriteLine("BAD REQUEST 10");
-                return;
+                ResponseID = "400";
+                ServerState = "Unable to parse Guid";
             }
 
             GameStateInfo stateInfo = null;
@@ -261,8 +258,8 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             if (stateInfo == null)
             {
-                Console.WriteLine("BAD REQUEST 11");
-                return;
+                ResponseID = "400";
+                ServerState = "No Action State Info";
             }
 
             // lock state during reset
@@ -276,8 +273,12 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 stateInfo.GameStopwatch.Start();
             }
 
-            Console.WriteLine("OK");
-            return;
+            if (ResponseID.Length == 0)
+            {
+                ResponseID = "200";
+                ServerState = "Successful Guess";
+            }
+            return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
         }
 
         /// <summary>
@@ -285,13 +286,18 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// </summary>
         /// <param name="gameStateInfos"></param>
         /// <param name="guidText"></param>
-        private void QuitGame(List<GameStateInfo> gameStateInfos, string guidText)
+        private string QuitGame(List<GameStateInfo> gameStateInfos, string guidText)
         {
+            string ResponseID = "";
+            string ServerState = "";
+            string gameRelatedData = "";
+            bool deleteSuccess = false;
+
             Guid parsedGuid;
             if (!Guid.TryParse(guidText, out parsedGuid))
             {
-                Console.WriteLine("BAD REQUEST 12");
-                return;
+                ResponseID = "400";
+                ServerState = "Unable to parse Guid";
             }
 
             for (int checkCount = 0; checkCount < gameStateInfos.Count; checkCount++)
@@ -299,11 +305,18 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 if(gameStateInfos[checkCount] != null && gameStateInfos[checkCount].ClientGuid == parsedGuid)
                 {
                     gameStateInfos.RemoveAt(checkCount);
-                    Console.WriteLine("OK");
-                    return;
+                    ResponseID = "200";
+                    ServerState = "Successful Guess";
+                    deleteSuccess = true;
                 }
             }
-            Console.WriteLine("BAD REQUEST 13");
+
+            if (!deleteSuccess)
+            {
+                ResponseID = "400";
+                ServerState = "Failure To Delete Client Info";
+            }
+            return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
         }
     }
 }
