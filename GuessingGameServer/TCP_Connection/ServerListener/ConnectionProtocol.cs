@@ -53,16 +53,15 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     break;
                 case "201": //guess game
                     serverResponseData = guessMade(gameStateInfos, protocolMessage[4], protocolMessage[1]);
-
                     break;
                 case "202": //new game
-                    NewGame(gameStateInfos, protocolMessage[1]);
+                    serverResponseData = NewGame(gameStateInfos, protocolMessage[1]);
                     break;
                 case "203": //Play Game
-                    NewGame(gameStateInfos, protocolMessage[1]);
+                    serverResponseData = NewGame(gameStateInfos, protocolMessage[1]);
                     break;
                 case "204": //Quit Game
-                    QuitGame(gameStateInfos, protocolMessage[1]);
+                    serverResponseData = QuitGame(gameStateInfos, protocolMessage[1]);
                     break;
                 default:
                     break;
