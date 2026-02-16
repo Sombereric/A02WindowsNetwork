@@ -156,9 +156,6 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
         }
 
-        //this is why state bags needs to be a class as to allow for us to create a list
-
-
         /// <summary>
         /// this will handle the login logic
         /// </summary>
@@ -168,6 +165,9 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// <param name="actionData"></param>
         private void Login(string userNamePasswordIpPort, string guidText, List<GameStateInfo> gameStateInfos)
         {
+            string ResponseID = "";
+            string ServerState = "";
+            string gameRelatedData = "";
 
             if (userNamePasswordIpPort == null || userNamePasswordIpPort.Trim().Length == 0)
             {
