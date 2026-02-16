@@ -40,5 +40,16 @@ namespace GuessingGameClient
                 MessageBox.Show(ex.ToString());
             }
         }
+
+        private void SubmitBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AboutBtn_Click(object sender, RoutedEventArgs e)
+        {
+         
+        }
+    }
     }
 }

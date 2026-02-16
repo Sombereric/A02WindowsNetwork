@@ -97,13 +97,23 @@ namespace ClientUI.GameLogic
                 if (gameData.ContainsKey("SENTENCE") == true)
                 {
                     checkSentence = gameData["SENTENCE"];
+                    if (checkSentence == null)
+                    {
+                        checkSentence = string.Empty;
+                    }
 
+                    if (checkSentence.Length != 30) // made sure i validate the 30 characters
+                    {
+                        checkGameOver = true;
+                        validData = false;
+                    }
                 }
 
                 if (gameData.ContainsKey("TOTALWORDS") == true)
                 {
                     string totalWordsText = gameData["TOTALWORDS"];
                     
+
                     int parsedTotalWords = 0;
 
                     if (int.TryParse(totalWordsText, out parsedTotalWords) == true)
@@ -209,7 +219,9 @@ namespace ClientUI.GameLogic
             return;
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         public void StartTimerTask()
         {
             bool canStartTime = true;
@@ -281,8 +293,40 @@ namespace ClientUI.GameLogic
 
             return;
         }
+
+        /// <summary>
+        /// stores each guess so the client can track guesses and apply server results
+        /// </summary>
+        /// <param name="guessWord"></param>
+        public void AddGuessWord(string guessWord)
+        {
+            bool canAdd = true; //  to determine if thee guess can be added
+
+            if (guessWord == null)
+            {
+                canAdd = false;
+            }
+
+            if (canAdd == true)
+            {
+                string cleanedGuess = guessWord.Trim(); // clean up any trails
+
+                if (cleanedGuess.Length == 0)
+                {
+                    canAdd = false;
+                }
+
+                if (canAdd == true)
+                {
+                    guessWordList.Add(cleanedGuess);
+                }
+            }
+
+            return;
+        }
+
     }
 
 
-    
+
 }
