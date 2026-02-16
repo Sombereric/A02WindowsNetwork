@@ -180,7 +180,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             bool finishRead = false;
             int bufferSizeDefault = 1024;
 
-            string checkBuffer = ConfigurationManager.AppSettings["BufferSizeBytes"];
+            string checkBuffer = ConfigurationManager.AppSettings["BufferSize"];
 
             //attempts the parse the buffer size in the config file
             if (!int.TryParse(checkBuffer, out int bufferSize))
@@ -213,11 +213,15 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 char delimiter = '|';
                 string[] protocolMessage = checkMessage.Split(delimiter);
 
-                if (protocolMessage.Length != 6)
+                if (protocolMessage.Length == 6)
                 {
                     connectionProtocol.ServerProtocolManager(protocolMessage, gameStateInfos, GameStateLocker);
                 }
 
+                else
+                {
+                    ui.WriteToConsole("BAD REQUEST");
+                }
                 //server response
 
             }

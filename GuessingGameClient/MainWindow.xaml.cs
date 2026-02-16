@@ -35,5 +35,23 @@ namespace GuessingGameClient
                 MessageBox.Show(ex.ToString());
             }
         }
+
+        private async void QuitBtn_Click(object sender, RoutedEventArgs e)
+        {
+     
+            try
+            {
+                // tell server we are quitting (protocol 203)
+                
+                string checkResponse = await ClientWorker.Run(203);
+                MessageBox.Show(checkResponse);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
     }
 }
