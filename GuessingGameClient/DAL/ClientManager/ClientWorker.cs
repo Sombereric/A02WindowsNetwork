@@ -12,7 +12,7 @@ namespace ClientUI.DAL.ClientManager
 {
     public class ClientWorker
     {
-        public static async Task <string> Run(int protocolId)
+        public static async Task <string> Run(int protocolId, string userName)
         {
             string serverIp = ConfigurationManager.AppSettings["ServerIP"];
             string portText = ConfigurationManager.AppSettings["ServerPort"];
@@ -43,7 +43,7 @@ namespace ClientUI.DAL.ClientManager
                 {
                     case 200:
                         commandAction = "Login";
-                        actionData = "username: password" + serverIp + ":" + portText;
+                        actionData = "username" + ":" + userName + ":" + serverIp + ":" + portText;
                         break;
 
                     case 201:

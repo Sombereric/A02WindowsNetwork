@@ -37,7 +37,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                         break;
                     }
 
-                    if (endToken != "End")
+                    if (endToken != "END")
                     {
                         Console.WriteLine("BAD REQUEST 2");
                     }
@@ -184,7 +184,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             // split the login data
             string[] checkParts = userNamePasswordIpPort.Split(':');
 
-            if (checkParts.Length < 4)
+            if (checkParts.Length != 4)
             {
                 Console.WriteLine("BAD REQUEST 7");
                 return;
