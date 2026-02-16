@@ -1,4 +1,13 @@
-﻿using System;
+﻿/*
+* FILE : ConnectionProtocol.cs
+* PROJECT : PROG2126 - Assignment #2
+* PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
+* FIRST VERSION : 2026-2-9
+* DESCRIPTION :
+* handles each request made by the client to the server and the respective action
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -6,13 +15,16 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using ClientUI.Protocols;
 
 namespace ClientUI.DAL.ClientManager
 {
     public class ClientWorker
     {
-        public static async Task <string> Run(int protocolId, string userName)
+        private static Guid clientGuid = Guid.NewGuid();
+
+        public static async Task<string> Run(int protocolId, string userName)
         {
             string serverIp = ConfigurationManager.AppSettings["ServerIP"];
             string portText = ConfigurationManager.AppSettings["ServerPort"];
@@ -21,7 +33,6 @@ namespace ClientUI.DAL.ClientManager
 
             if (Int32.TryParse(portText, out Int32 result))
             {
-                //i died inside
             }
 
             int serverPort = result;
@@ -37,7 +48,7 @@ namespace ClientUI.DAL.ClientManager
 
             StringBuilder checkResponse = new StringBuilder();
 
-            if(!int.TryParse(portText, out serverPort))
+            if (!int.TryParse(portText, out serverPort))
             {
                 checkOk = false;
             }
@@ -47,44 +58,40 @@ namespace ClientUI.DAL.ClientManager
                 switch (protocolId)
                 {
                     case 200:
-                        commandAction = "Login";
-                        actionData = "username" + ":" + userName + ":" + serverIp + ":" + portText;
+                        commandAction = "-";
+                        actionData = userName;
                         break;
 
                     case 201:
                         commandAction = "Guess";
-                        actionData = "testWord";
+                        actionData = userName;
                         break;
-
                     case 202:
-                        commandAction = "NewGame";
+                        commandAction = "-";
                         actionData = "-";
                         break;
 
                     case 203:
-                        commandAction = "Quit";
+                        commandAction = "-";
                         actionData = "-";
                         break;
 
                     case 204:
-                        commandAction = "PlayAgain";
+                        commandAction = "-";
                         actionData = "-";
                         break;
 
                     default:
                         checkOk = false;
                         break;
-
                 }
 
                 // this will build the protcol message directly 
                 if (checkOk == true)
                 {
-                    Guid clientGuid = Guid.NewGuid();
                     string timeSent = DateTime.UtcNow.ToString("o");
 
-                    checkRequst = protocolId.ToString() + "|" + clientGuid.ToString() + "|" + timeSent + "|" + commandAction + "|" + actionData + "|END|";
-
+                    checkRequst = protocolId.ToString() + "|" + clientGuid.ToString() + "|" + timeSent + "|" + timeSent + "|" + commandAction + "|" + actionData + "|END|";
                 }
 
                 // this will disconnect the request and response
@@ -93,13 +100,14 @@ namespace ClientUI.DAL.ClientManager
                     try
                     {
                         checkClient = new TcpClient();
-                        
+
                         await checkClient.ConnectAsync(serverIp, serverPort);
 
                         networkStream = checkClient.GetStream();
                         reader = new StreamReader(networkStream);
                         writer = new StreamWriter(networkStream);
                         writer.AutoFlush = true;
+
 
                         await writer.WriteLineAsync(checkRequst);
 
@@ -120,10 +128,8 @@ namespace ClientUI.DAL.ClientManager
                             }
                         }
                     }
-
                     finally
                     {
-
                         if (networkStream != null)
                         {
                             networkStream.Close();
@@ -136,6 +142,7 @@ namespace ClientUI.DAL.ClientManager
                     }
                 }
             }
+
             return checkResponse.ToString();
         }
     }

@@ -209,17 +209,21 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 char delimiter = '|';
                 string[] protocolMessage = checkMessage.Split(delimiter);
 
+                string checkResponse = "";
+
                 if (protocolMessage.Length == 6)
                 {
-                    connectionProtocol.ServerProtocolManager(protocolMessage, gameStateInfos, GameStateLocker);
+                    checkResponse = connectionProtocol.ServerProtocolManager(protocolMessage, gameStateInfos, GameStateLocker);
                 }
-
                 else
                 {
-                    ui.WriteToConsole("BAD REQUEST");
+                    checkResponse = "400|Invalid Request|-|END|";
                 }
-                //server response
 
+                // send it to client
+                byte[] responseBytes = Encoding.UTF8.GetBytes(checkResponse);
+                await stream.WriteAsync(responseBytes, 0, responseBytes.Length);
+                await stream.FlushAsync();
             }
             catch (Exception ex)
             {

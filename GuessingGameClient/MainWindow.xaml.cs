@@ -23,6 +23,12 @@ namespace GuessingGameClient
         {
             InitializeComponent();
         }
+
+        /// <summary>
+        /// this will start the game
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void StartBtn_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -39,6 +45,12 @@ namespace GuessingGameClient
                 MessageBox.Show(ex.ToString());
             }
         }
+
+        /// <summary>
+        /// this will quit the game
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 
         private async void QuitBtn_Click(object sender, RoutedEventArgs e)
         {

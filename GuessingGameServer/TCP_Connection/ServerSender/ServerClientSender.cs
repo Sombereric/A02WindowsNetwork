@@ -1,4 +1,13 @@
-﻿using System;
+﻿/*
+* FILE : ServerClientSender.cs
+* PROJECT : PROG2126 - Assignment #2
+* PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
+* FIRST VERSION : 2026-2-9
+* DESCRIPTION :
+* handles the response of the client sender
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -36,7 +45,7 @@ namespace GuessingGameServer.TCP_Connection.ServerSender
         }
 
         /// <summary>
-        /// 
+        /// this method will check the send response
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="respondMessage"></param>

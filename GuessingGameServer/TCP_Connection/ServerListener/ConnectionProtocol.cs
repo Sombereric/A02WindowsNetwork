@@ -26,30 +26,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             switch (protocolMessage[0])
             {
                 case "200": //client login
-
-                    string guidText = protocolMessage[1]; // the client guid
-                    string timeSent = protocolMessage[2]; // time it was sent
-                    string takeAction = protocolMessage[3]; // the action string
-                    string actionData = protocolMessage[4]; // the data sent with action
-                    string endToken = protocolMessage[5]; // should end
-
-                    if (takeAction != "Login")
-                    {
-                        Console.WriteLine("BAD REQUEST 1");
-                        break;
-                    }
-
-                    if (endToken != "END")
-                    {
-                        Console.WriteLine("BAD REQUEST 2");
-                    }
-
-                    Login(actionData, guidText, gameStateInfos);
-
-                    //creates state bag and picks a random file
-                    //each one of these will have the proper function call for the data that they should get
-                    //for example this will handle the guid and other such items
-                    //check the read.me for the details of each protocol
+                    serverResponseData = Login(protocolMessage[4], protocolMessage[1], gameStateInfos);
                     break;
                 case "201": //guess game
                     serverResponseData = guessMade(gameStateInfos, protocolMessage[4], protocolMessage[1]);
@@ -70,7 +47,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         }
 
         /// <summary>
-        /// 
+        /// this method will made the guess
         /// </summary>
         /// <param name="gameStateInfos"></param>
         /// <param name="guess"></param>

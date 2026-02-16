@@ -1,4 +1,13 @@
-﻿using System;
+﻿/*
+* FILE : TimeChecker.cs
+* PROJECT : PROG2126 - Assignment #2
+* PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
+* FIRST VERSION : 2026-2-9
+* DESCRIPTION :
+handles the time being made
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -43,6 +52,9 @@ namespace GuessingGameServer.GameLogic
         private int checkTime;
         private string stopTime;
 
+        /// <summary>
+        /// this will check the time
+        /// </summary>
         private static void checkTimer()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();

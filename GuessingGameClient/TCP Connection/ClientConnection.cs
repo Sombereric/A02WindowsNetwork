@@ -67,7 +67,7 @@ namespace ClientUI.TCP_Connection
         /// 
         /// </summary>
         /// <returns></returns>
-        private async Task <string> ReadMessageAtEnd()
+        private async Task<string> ReadMessageAtEnd()
         {
             StringBuilder sb = new StringBuilder();
             string checkLine;
@@ -75,22 +75,22 @@ namespace ClientUI.TCP_Connection
             while (true)
             {
                 checkLine = await reader.ReadLineAsync();
-                
-                if(checkLine == null)
+
+                if (checkLine == null)
                 {
                     throw new Exception("Connection closed");
-        
-
                 }
-                else if(checkLine == "END")
+
+                if (checkLine.Contains("|END|"))
                 {
+                    sb.AppendLine(checkLine);
                     break;
                 }
 
                 sb.AppendLine(checkLine);
             }
 
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
 
         /// <summary>

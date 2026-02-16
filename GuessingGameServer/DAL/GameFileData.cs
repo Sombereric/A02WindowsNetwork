@@ -1,4 +1,11 @@
-﻿
+﻿/*
+* FILE : ConnectionProtocol.cs
+* PROJECT : PROG2126 - Assignment #2
+* PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
+* FIRST VERSION : 2026-2-9
+* DESCRIPTION :
+* handles each request made by the client to the server and the respective action
+*/
 
 
 using System;
