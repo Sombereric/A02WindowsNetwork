@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace GuessingGameServer.GameLogic
 {
@@ -39,5 +40,30 @@ namespace GuessingGameServer.GameLogic
         }
 
         
+        private int checkTime;
+        private string stopTime;
+
+        private static void checkTimer()
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
+            TimeSpan timeSpan = stopwatch.Elapsed;
+
+            if (timeSpan.TotalSeconds < 1000)
+            {
+                stopwatch.Stop();
+            }
+
+            else if (timeSpan.TotalSeconds > 1000)
+            {
+                stopwatch.Restart();
+            }
+        }
+
+
+
     }
+
+
 }

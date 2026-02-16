@@ -8,8 +8,4 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ClientUI\ClientUI.csproj" />
-  </ItemGroup>
-
 </Project>
