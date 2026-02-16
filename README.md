@@ -53,25 +53,25 @@ ___
         right to left:                bat, test
 ___
         File                          #2
-        30 Character String           
-        Number of words to find       
+        30 Character String           starstartartsmarttartsramarts
+        Number of words to find       16
 
-        left to right:                
-        right to left:                
+        left to right:                star, start, art, arts, smart, tarts, ram, mars
+        right to left:                rats, tram, tar, rat, arm, am, at, mat
 ___
         File                          #3
-        30 Character String           
-        Number of words to find       
+        30 Character String           parttrapartaparttarpartrat
+        Number of words to find       16 words
 
-        left to right:                
-        right to left:    
+        left to right:                part, trap, apart, tar, par, rat, art, rap
+        right to left:                trap, tarp, pat, tap, at, pa, apt, ta
 ___
         File                          #4
-        30 Character String           
-        Number of words to find       
+        30 Character String           noteonestonetenotestonestone
+        Number of words to find       16 words
 
-        left to right:                
-        right to left:    
+        left to right:                note, one, stone, ten, tone, notes, set, son
+        right to left:                net, ton, eon, ones, sent, not, to, no
 ___
 GamePlay Flow,
 user presses start game,
