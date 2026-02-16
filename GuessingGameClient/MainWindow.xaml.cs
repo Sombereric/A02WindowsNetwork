@@ -28,7 +28,11 @@ namespace GuessingGameClient
             try
             {
                 string checkResponse = await ClientWorker.Run(200, UserNameTB.Text);
-                MessageBox.Show(checkResponse);
+                UIGamePage uIGamePage = new UIGamePage();
+
+                this.Hide();
+
+                uIGamePage.Show();
             }
             catch (Exception ex)
             {
@@ -38,13 +42,12 @@ namespace GuessingGameClient
 
         private async void QuitBtn_Click(object sender, RoutedEventArgs e)
         {
-     
             try
             {
                 // tell server we are quitting (protocol 203)
                 
-                string checkResponse = await ClientWorker.Run(203);
-                MessageBox.Show(checkResponse);
+                string checkResponse = await ClientWorker.Run(203, "-");
+                this.Close();
 
             }
             catch (Exception ex)

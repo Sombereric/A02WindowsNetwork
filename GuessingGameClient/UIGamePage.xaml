@@ -9,7 +9,7 @@
     <Grid RenderTransformOrigin="0.496,0.483">
         <TextBox x:Name="GuessBox" HorizontalAlignment="Center" FontSize="30" Margin="0,129,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="250" RenderTransformOrigin="-0.038,0.679"/>
         <Button x:Name="AboutBtn" Content="ABOUT" HorizontalAlignment="Left" Margin="45,37,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.286,-0.395"/>
-        <Button x:Name="QuitBtn" Content="QUIT GAME" HorizontalAlignment="Left" Margin="691,37,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="QuitBtn" Content="QUIT GAME" HorizontalAlignment="Left" Margin="691,37,0,0" VerticalAlignment="Top" Click="QuitBtn_Click"/>
         <Button x:Name="SubmitBtn" Content="SUBMIT" FontSize="25" HorizontalAlignment="Left" Margin="549,361,0,0" VerticalAlignment="Top" RenderTransformOrigin="5.95,0.638"/>
         <TextBox x:Name="StringDisplayTB" HorizontalAlignment="Center" FontSize="25" Margin="0,266,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="250" RenderTransformOrigin="-0.123,0.702"/>
         <TextBox HorizontalAlignment="Center" FontSize="30" Margin="0,359,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="250" RenderTransformOrigin="0.285,0.456"/>
