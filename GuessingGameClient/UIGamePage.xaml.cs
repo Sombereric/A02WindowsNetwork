@@ -66,8 +66,22 @@ namespace GuessingGameClient
                 return;
             }
 
-            StringDisplayTB.Text = parts[1];
-            WordCountBox.Text = parts[2];
+            string[] actionData = parts[2].Split(':');
+
+            if (WordCountBox.Text.Length == 0)
+            {
+                WordCountBox.Text = actionData[0];
+            }
+
+            StringDisplayTB.Text = actionData[1];
+            actionData[0] = "";
+            actionData[1] = "";
+            WordsFound.Text = "";
+
+            foreach (string s in actionData)
+            {   
+                WordsFound.Text += s + ' ';
+            }
 
             return;
         }

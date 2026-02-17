@@ -29,7 +29,6 @@ namespace GuessingGameServer.DAL
             CheckSentence = checkSentence;
             TotalWords = totalWords;
             CheckWords = checkWords;
-
         }
     }
 }

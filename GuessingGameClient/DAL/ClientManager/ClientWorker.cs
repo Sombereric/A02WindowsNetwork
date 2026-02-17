@@ -58,7 +58,7 @@ namespace ClientUI.DAL.ClientManager
                 switch (protocolId)
                 {
                     case 200:
-                        commandAction = "-";
+                        commandAction = "Login";
                         actionData = userName;
                         break;
 
@@ -67,8 +67,8 @@ namespace ClientUI.DAL.ClientManager
                         actionData = userName;
                         break;
                     case 202:
-                        commandAction = "-";
-                        actionData = "-";
+                        commandAction = "NewGame";
+                        actionData = userName + ':' + serverIp + ':' + portText;
                         break;
 
                     case 203:
@@ -77,7 +77,7 @@ namespace ClientUI.DAL.ClientManager
                         break;
 
                     case 204:
-                        commandAction = "-";
+                        commandAction = "QuitGames";
                         actionData = "-";
                         break;
 
@@ -91,7 +91,7 @@ namespace ClientUI.DAL.ClientManager
                 {
                     string timeSent = DateTime.UtcNow.ToString("o");
 
-                    checkRequst = protocolId.ToString() + "|" + clientGuid.ToString() + "|" + timeSent + "|" + timeSent + "|" + commandAction + "|" + actionData + "|END|";
+                    checkRequst = protocolId.ToString() + "|" + clientGuid.ToString() + "|" + timeSent + "|" + commandAction + "|" + actionData + "|END|";
                 }
 
                 // this will disconnect the request and response

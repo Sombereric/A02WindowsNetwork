@@ -10,14 +10,15 @@
 
     <Grid RenderTransformOrigin="0.496,0.483">
 
-        <TextBox x:Name="GuessBox"
+        <TextBox x:Name="WordCountBox"
                  HorizontalAlignment="Center"
                  FontSize="30"
                  Margin="0,129,0,0"
                  TextWrapping="Wrap"
                  Text=""
                  VerticalAlignment="Top"
-                 Width="250"/>
+                 Width="389"
+                 IsReadOnly="True"/>
 
         <Button x:Name="AboutBtn"
                 Content="ABOUT"
@@ -50,20 +51,19 @@
                  Width="250"
                  IsReadOnly="True"/>
 
-        <TextBox x:Name="WordCountBox"
+        <TextBox x:Name="GuessBox"
                  HorizontalAlignment="Center"
                  FontSize="30"
                  Margin="0,359,0,0"
                  TextWrapping="Wrap"
                  Text=""
                  VerticalAlignment="Top"
-                 Width="250"
-                 IsReadOnly="True"/>
+                 Width="250"/>
 
         <TextBox x:Name="TimerBox"
                  HorizontalAlignment="Left"
                  FontSize="25"
-                 Margin="168,362,0,0"
+                 Margin="150,357,0,0"
                  TextWrapping="NoWrap"
                  Text=""
                  VerticalAlignment="Top"
@@ -96,6 +96,14 @@
                VerticalAlignment="Top"
                Height="26"
                Width="105"/>
+        <TextBox x:Name="WordsFound"
+            HorizontalAlignment="Center"
+            FontSize="30"
+            TextWrapping="Wrap"
+            Text=""
+            VerticalAlignment="Center"
+            Width="668"
+            IsReadOnly="True"/>
 
     </Grid>
 </Window>

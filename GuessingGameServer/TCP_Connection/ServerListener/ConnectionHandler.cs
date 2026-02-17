@@ -31,7 +31,6 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// </summary>
         public async Task MainServerListener(List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
-            Console.WriteLine("I cam twice");
             //gets the server port and IP from the config file
             string ServerPort = ConfigurationManager.AppSettings["ServerPort"];
 
@@ -211,7 +210,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
                 string checkResponse = "";
 
-                if (protocolMessage.Length == 6)
+                if (protocolMessage.Length == 7)
                 {
                     checkResponse = connectionProtocol.ServerProtocolManager(protocolMessage, gameStateInfos, GameStateLocker);
                 }

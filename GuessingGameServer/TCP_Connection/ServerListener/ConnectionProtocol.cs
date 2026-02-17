@@ -10,6 +10,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Net;
+using GuessingGameServer.DAL;
 using GuessingGameServer.GameLogic;
 
 namespace GuessingGameServer.TCP_Connection.ServerListener
@@ -32,10 +33,10 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     serverResponseData = guessMade(gameStateInfos, protocolMessage[4], protocolMessage[1]);
                     break;
                 case "202": //new game
-                    serverResponseData = NewGame(gameStateInfos, protocolMessage[1]);
+                    serverResponseData = NewGame(gameStateInfos, protocolMessage, GameStateLocker);
                     break;
                 case "203": //Play Game
-                    serverResponseData = NewGame(gameStateInfos, protocolMessage[1]);
+                    serverResponseData = NewGame(gameStateInfos, protocolMessage, GameStateLocker);
                     break;
                 case "204": //Quit Game
                     serverResponseData = QuitGame(gameStateInfos, protocolMessage[1]);
@@ -110,7 +111,13 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                         gameRelatedData = "WINNER";
                     }
 
-                    gameRelatedData = "FOUND";
+                    gameRelatedData = "FOUND" + ':' + stateInfo.NumberOfWordsLeft;
+                    stateInfo.NumberOfWordsLeft--;
+                    foreach (string word in stateInfo.TotalWordsFound)
+                    {
+                        gameRelatedData += ':' + word ;
+                    }
+                    stateInfo.TotalWordsFound.Add(cleanTheGuess);
 
                 }
                 else if (lookResult == 1)
@@ -208,14 +215,14 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// </summary>
         /// <param name="gameStateInfos"></param>
         /// <param name="guidText"></param>
-        private string NewGame(List<GameStateInfo> gameStateInfos, string guidText)
+        private string NewGame(List<GameStateInfo> gameStateInfos, string[] protocolMessage, object GameStateLocker)
         {
             string ResponseID = "";
             string ServerState = "";
             string gameRelatedData = "";
 
             Guid parsedGuid;
-            if (!Guid.TryParse(guidText, out parsedGuid))
+            if (!Guid.TryParse(protocolMessage[1], out parsedGuid))
             {
                 ResponseID = "400";
                 ServerState = "Unable to parse Guid";
@@ -233,21 +240,51 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 }
             }
 
-            if (stateInfo == null)
+            char delimiter = ':';
+            string[] actionData = protocolMessage[4].Split(delimiter);
+
+            if (!Int32.TryParse(actionData[2], out int port))
             {
                 ResponseID = "400";
-                ServerState = "No Action State Info";
+                ServerState = "Unable to parse port";
+            }
+            if (!IPAddress.TryParse(actionData[1], out IPAddress ipAddress))
+            {
+                ResponseID = "400";
+                ServerState = "Unable to parse ipAddress";
             }
 
-            // lock state during reset
-            lock (stateInfo.GameStateLocker)
-            {
-                stateInfo.TotalWordsFound.Clear();
-                stateInfo.TotalWordsToFind.Clear();
-                stateInfo.NumberOfWordsLeft = 0;
+            fileLoader fileLoader = new fileLoader();
+            GameFileData gameFileData = fileLoader.LoadRandomGame();
 
-                stateInfo.GameStopwatch.Reset();
-                stateInfo.GameStopwatch.Start();
+            gameRelatedData = gameFileData.CheckSentence + ':' + gameFileData.TotalWords;
+
+            if (stateInfo == null)
+            {
+                lock (GameStateLocker)
+                {
+                    GameStateInfo gameStateInfo = new GameStateInfo();
+                    gameStateInfo.ClientGuid = parsedGuid;
+                    gameStateInfo.Port = port;
+                    gameStateInfo.ClientIp = ipAddress;
+                    gameStateInfo.TotalWordsToFind = gameFileData.CheckWords;
+                    gameStateInfo.NumberOfWordsLeft = gameFileData.TotalWords;
+                    gameStateInfos.Add(gameStateInfo);
+                }
+            }
+            //if new player
+            else
+            {
+                // lock state during reset
+                lock (stateInfo.GameStateLocker)
+                {
+                    stateInfo.TotalWordsFound.Clear();
+                    stateInfo.TotalWordsToFind.Clear();
+                    stateInfo.NumberOfWordsLeft = 0;
+
+                    stateInfo.GameStopwatch.Reset();
+                    stateInfo.GameStopwatch.Start();
+                }
             }
 
             if (ResponseID.Length == 0)

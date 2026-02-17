@@ -18,10 +18,6 @@ namespace GuessingGameServer.DAL
 {
     internal class fileLoader
     {
-
-        private static readonly string filePath = ConfigurationManager.AppSettings["FilePath"];
-
-
         /// <summary>
         /// 
         /// </summary>
@@ -33,7 +29,7 @@ namespace GuessingGameServer.DAL
 
             int randomIndex = random.Next(gameFiles.Length);
 
-            string selectedFile = Path.Combine(filePath, gameFiles[randomIndex]); // combine file
+            string selectedFile = Path.Combine(gameFiles[randomIndex]); // combine file
 
             return LoadGameFile(selectedFile);
 
