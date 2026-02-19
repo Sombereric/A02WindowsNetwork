@@ -31,40 +31,48 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// </summary>
         public async Task MainServerListener(List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
+            //used to stop the server should any connection setup fail
+            bool serverSetupSuccess = true;
             //gets the server port and IP from the config file
             string ServerPort = ConfigurationManager.AppSettings["ServerPort"];
 
             TcpListener server = null;
-
             try
             {
+                //attempts to parse the port of the server from the app config
                 if (!Int32.TryParse(ServerPort, out Int32 port))
                 {
+                    //logs the error and stops the server settingup
                     ui.WriteToConsole("Failure to parse server port");
+                    serverSetupSuccess = false;
                 }
+                if (serverSetupSuccess)
+                {
+                    //creates the listener
+                    server = new TcpListener(IPAddress.Any, port);
 
-                //creates the listener
-                server = new TcpListener(IPAddress.Any, port);
+                    //start listening for clients requests
+                    server.Start();
+                    Task runnerTask = TaskRunner(server, gameStateInfos, GameStateLocker);
 
-                //start listening for clients requests
-                server.Start();
+                    //lets admins know server is running
+                    ui.WriteToConsole("server running");
 
-                //ui.WriteToConsole("Server Listening on " + serverIPParsed.ToString() + ":" + port);
+                    ui.WriteToConsole("To stop the server Press Enter...");
+                    ui.ReadFromConsole();
 
-                TaskRunner(server, gameStateInfos, GameStateLocker);
+                    cts.Cancel();
 
-                ui.WriteToConsole("To stop the server Press Enter...");
-                ui.ReadFromConsole();
+                    server.Stop();
 
-                cts.Cancel();
+                    StopTheClient();
 
-                StopTheClient();
+                    await runnerTask;
 
-                server.Stop();
-
-                ui.WriteToConsole("Server Closed");
+                    ui.WriteToConsole("Server Closed");
+                }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 ui.WriteToConsole("Unexpected server failure " + ex.Message);
             }
@@ -119,51 +127,44 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             }
         }
         /// <summary>
-        /// where the tasks are handed 
+        /// this is where the tasks and connections are handled and created
         /// </summary>
-        /// <param name="server">the server clients connect to</param>
-        private void TaskRunner(TcpListener server, List<GameStateInfo> gameStateInfos, object GameStateLocker)
+        /// <param name="server">the server name</param>
+        /// <param name="gameStateInfos">the list of game states currently connected</param>
+        /// <param name="GameStateLocker">protects the game state list from multiple changes</param>
+        /// <returns>returns the task handler</returns>
+        private async Task TaskRunner(TcpListener server, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
-            //accept loop on a task so console can stop server
-            Task.Run(() =>
-            {
-                try
-                {
-                    while (!cts.Token.IsCancellationRequested)
-                    {
-                        ui.WriteToConsole("Server connection begun");
-                        serverClientWorker(server, gameStateInfos, GameStateLocker);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ui.WriteToConsole("Unexpected TCP Server failure: " + ex.Message);
-                }
-            });
-        }
-        /// <summary>
-        /// where the work is actually done on the server side
-        /// </summary>
-        /// <param name="server">the name of the server listening</param>
-        private void serverClientWorker(TcpListener server, List<GameStateInfo> gameStateInfos, object GameStateLocker)
-        {
-            TcpClient client = server.AcceptTcpClient();
-
-            ui.WriteToConsole("Client Connected");
-
-            lock (locker)
-            {
-                clients.Add(client);
-            }
-
+            List<Task> tasks = new List<Task>();
             try
             {
-                //where the tasks are created to handle
-                Task clientHandlerTask = Task.Run(async () => await ConnectionClientHandler(client, gameStateInfos, GameStateLocker));
+                while (!cts.Token.IsCancellationRequested)
+                {
+                    ui.WriteToConsole("Server connection begun");
+                    TcpClient client = await server.AcceptTcpClientAsync();
+                    Task handlerTask = ConnectionClientHandler(client, gameStateInfos, GameStateLocker);
+                    tasks.Add(handlerTask);
+                    tasks.RemoveAll(task => task.IsCompleted);
+                }
             }
             catch (Exception ex)
             {
-                ui.WriteToConsole("Failure during client connection: " + ex.Message);
+                if (!cts.Token.IsCancellationRequested)
+                {
+                    ui.WriteToConsole(ex.Message);
+                }
+            }
+            finally
+            {
+                try
+                {
+                    await Task.WhenAll(tasks);
+                }
+                catch (Exception ex)
+                {
+                    ui.WriteToConsole(ex.Message);
+                }
+                
             }
             return;
         }

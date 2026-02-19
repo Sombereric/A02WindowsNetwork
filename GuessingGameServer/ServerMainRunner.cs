@@ -9,26 +9,24 @@
 
 using GuessingGameServer.GameLogic;
 using GuessingGameServer.TCP_Connection.ServerListener;
-using GuessingGameServer.TCP_Connection.ServerSender;
+using GuessingGameServer.UserInterface;
 
 namespace GuessingGameServer
 {
     internal class ServerMainRunner
     {
-        private static readonly List<GameStateInfo> gameStatesInfo = new List<GameStateInfo>();
-        public readonly object GameStateLocker = new object();
-        
+        private readonly List<GameStateInfo> gameStatesInfo = new List<GameStateInfo>();
+        private readonly object GameStateLocker = new object();
+
         /// <summary>
         /// runs the server method
         /// </summary>
-        /// <returns></returns>
-        public async Task mainRunner() 
+        /// <returns>Life time of the server</returns>
+        public async Task MainRunner() 
         {
-            Console.WriteLine("server running");
             ConnectionHandler connectionHandler = new ConnectionHandler();
-
             await connectionHandler.MainServerListener(gameStatesInfo, GameStateLocker);
-
+            return;
         }
     }
 }

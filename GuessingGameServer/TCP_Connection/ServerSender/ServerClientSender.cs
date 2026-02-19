@@ -7,14 +7,8 @@
 * handles the response of the client sender
 */
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.Unicode;
-using System.Threading.Tasks;
 
 namespace GuessingGameServer.TCP_Connection.ServerSender
 {
@@ -40,7 +34,7 @@ namespace GuessingGameServer.TCP_Connection.ServerSender
             }
 
             string readResponse = respondID.ToString() + "|" + serverState + "|" + gameData + "|END|";
-            
+
             return readResponse;
         }
 
@@ -52,16 +46,11 @@ namespace GuessingGameServer.TCP_Connection.ServerSender
         /// <returns></returns>
         public static async Task SendResponse(NetworkStream stream, string respondMessage)
         {
-            byte [] bytes = Encoding.UTF8.GetBytes(respondMessage + "\n");
-            
-            await stream.WriteAsync(bytes, 0, bytes.Length);
-            
-            await stream.FlushAsync();
-        
-        }
-        
-            
-     }
-     
-    }
+            byte[] bytes = Encoding.UTF8.GetBytes(respondMessage + "\n");
 
+            await stream.WriteAsync(bytes, 0, bytes.Length);
+
+            await stream.FlushAsync();
+        }
+    }
+}

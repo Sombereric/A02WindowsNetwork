@@ -4,7 +4,7 @@
 * PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
 * FIRST VERSION : 2026-2-10
 * DESCRIPTION :
-* all ui writes
+* all ui writes and reads
 */
 
 namespace GuessingGameServer.UserInterface
