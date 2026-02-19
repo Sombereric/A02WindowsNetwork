@@ -113,6 +113,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
                     gameRelatedData = "FOUND" + ':' + stateInfo.NumberOfWordsLeft;
                     stateInfo.NumberOfWordsLeft--;
+
                     foreach (string word in stateInfo.TotalWordsFound)
                     {
                         gameRelatedData += ':' + word ;
