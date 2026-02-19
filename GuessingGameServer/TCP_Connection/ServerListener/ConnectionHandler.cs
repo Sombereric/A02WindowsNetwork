@@ -168,6 +168,13 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             }
             return;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="gameStateInfos"></param>
+        /// <param name="GameStateLocker"></param>
+        /// <returns></returns>
         private async Task ConnectionClientHandler(TcpClient client, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
             NetworkStream stream = client.GetStream();
@@ -189,7 +196,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             try
             {
-                while (!finishRead && !cts.IsCancellationRequested)
+                while (!finishRead && !cts.Token.IsCancellationRequested)
                 {
                     int bytesRead = 0;
                     bytesRead = await stream.ReadAsync(buffer, 0, bufferSize, cts.Token);
@@ -227,7 +234,10 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             }
             catch (Exception ex)
             {
-                ui.WriteToConsole("Client handler error: " + ex.Message);
+                if (!cts.Token.IsCancellationRequested)
+                {
+                    ui.WriteToConsole(ex.Message);
+                }
             }
             finally
             {
