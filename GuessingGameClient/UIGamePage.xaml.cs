@@ -172,7 +172,6 @@ namespace GuessingGameClient
                 }
 
                 string checkResponse = await ClientWorker.Run(201, checkGuessText, clientGuid);
-                MessageBox.Show(checkResponse);
 
                 UpdateUI(checkResponse);
 

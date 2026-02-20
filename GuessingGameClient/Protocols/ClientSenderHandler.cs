@@ -26,7 +26,6 @@ namespace GuessingGameClient.Protocols
             {
                 tester += line;
             }
-            MessageBox.Show(tester);
         }
     }
 }
