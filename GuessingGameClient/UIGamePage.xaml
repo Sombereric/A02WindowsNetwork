@@ -63,7 +63,7 @@
         <TextBox x:Name="TimerBox"
                  HorizontalAlignment="Left"
                  FontSize="25"
-                 Margin="150,357,0,0"
+                 Margin="136,357,0,0"
                  TextWrapping="NoWrap"
                  Text=""
                  VerticalAlignment="Top"
@@ -92,10 +92,10 @@
         <Label x:Name="RemainingTimeLbl"
                Content="Remaining Time:"
                HorizontalAlignment="Left"
-               Margin="168,331,0,0"
+               Margin="144,331,0,0"
                VerticalAlignment="Top"
                Height="26"
-               Width="105"/>
+               Width="104"/>
         <TextBox x:Name="WordsFound"
             HorizontalAlignment="Center"
             FontSize="30"

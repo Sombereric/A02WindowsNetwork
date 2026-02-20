@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ClientUI.DAL.ClientManager;
+using GuessingGameClient.Protocols;
 
 
 namespace GuessingGameClient
@@ -19,43 +20,54 @@ namespace GuessingGameClient
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static Guid clientGuid = Guid.NewGuid();
+        clientSenderHandler clientSenderHandler = new clientSenderHandler();
         public MainWindow()
         {
             InitializeComponent();
+            StartBtn.IsEnabled = false;
         }
-
         /// <summary>
         /// this will start the game
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private async void StartBtn_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                string checkResponse = await ClientWorker.Run(200, UserNameTB.Text);
-                UIGamePage uIGamePage = new UIGamePage();
+                await clientSenderHandler.testFunction(UserNameTB.Text, clientGuid);
 
-                this.Close();
-
+                UIGamePage uIGamePage = new UIGamePage(clientGuid);
                 uIGamePage.Show();
+
+                Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
             }
         }
-
         /// <summary>
         /// this will quit the game
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="e"></param>
-
+        /// <param name="e"></param
         private async void QuitBtn_Click(object sender, RoutedEventArgs e)
         {
-
-                this.Close();
+             Close();
+        }
+        /// <summary>
+        /// disables the start button when the text box is empty
+        /// </summary>
+        private void UserNameTB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (UserNameTB.Text.Length == 0)
+            {
+                StartBtn.IsEnabled = false;
+            }
+            else
+            {
+                StartBtn.IsEnabled = true;
+            }
         }
     }
 }

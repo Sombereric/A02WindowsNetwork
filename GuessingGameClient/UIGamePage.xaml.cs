@@ -1,12 +1,15 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows;
-using ClientUI.DAL.ClientManager;
+﻿using System.Windows;
 
 namespace GuessingGameClient
 {
     public partial class UIGamePage : Window
     {
+        public Guid clientGuid;
+        public UIGamePage(Guid ClientGuid)
+        {
+            clientGuid = ClientGuid;
+            InitializeComponent();
+        }
         public UIGamePage()
         {
             InitializeComponent();
@@ -98,9 +101,9 @@ namespace GuessingGameClient
             {
                 string checkUser = "Player"; // use a temporary username
                  
-                await ClientWorker.Run(200, checkUser);
+                await ClientWorker.Run(200, checkUser, clientGuid);
 
-                string gameResponse = await ClientWorker.Run(202, "-");
+                string gameResponse = await ClientWorker.Run(202, "-", clientGuid);
                 
                 UpdateUI(gameResponse); // based on the response it will update
             }
@@ -124,7 +127,7 @@ namespace GuessingGameClient
             {
                 isGameOver = true;
 
-                ClientWorker.Run(203, "-");
+                ClientWorker.Run(203, "-", clientGuid);
 
                 this.Close();
             }
@@ -159,7 +162,7 @@ namespace GuessingGameClient
                     return;
                 }
 
-                string checkResponse = await ClientWorker.Run(201, checkGuessText);
+                string checkResponse = await ClientWorker.Run(201, checkGuessText, clientGuid);
                 MessageBox.Show(checkResponse);
 
                 UpdateUI(checkResponse);

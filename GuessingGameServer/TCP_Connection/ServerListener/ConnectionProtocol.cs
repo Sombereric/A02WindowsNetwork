@@ -114,16 +114,28 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     requestFailure = true;
                 }
 
-                // create new game state object
-                GameStateInfo newState = new GameStateInfo();
-                newState.ClientGuid = parsedGuid;
-                newState.ClientIp = checkIP;
-                newState.Port = checkPort;
+
+                fileLoader fileLoader = new fileLoader();
+                GameFileData gameFileData = fileLoader.LoadRandomGame();
+
+                gameRelatedData = gameFileData.CheckSentence + ':' + gameFileData.TotalWords;
+                GameStateInfo gameStateInfo = new GameStateInfo();
+
+                lock (GameStateLocker)
+                {
+                    // create new game state object
+                    gameStateInfo.ClientGuid = parsedGuid;
+                    gameStateInfo.Port = checkPort;
+                    gameStateInfo.ClientIp = checkIP;
+                    gameStateInfo.TotalWordsToFind = gameFileData.CheckWords;
+                    gameStateInfo.NumberOfWordsLeft = gameFileData.TotalWords;
+                    gameStateInfos.Add(gameStateInfo);
+                }
 
                 // add new state to list
                 lock (GameStateLocker)
                 {
-                    gameStateInfos.Add(newState);
+                    gameStateInfos.Add(gameStateInfo);
                 }
                 //if the responseid length is zero that means it succeeded
                 if (ResponseID.Length == 0)
@@ -328,37 +340,20 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
                 gameRelatedData = gameFileData.CheckSentence + ':' + gameFileData.TotalWords;
 
-                //if new player
-                if (stateInfo == null)
-                {
-                    lock (GameStateLocker)
-                    {
-                        GameStateInfo gameStateInfo = new GameStateInfo();
-                        gameStateInfo.ClientGuid = parsedGuid;
-                        gameStateInfo.Port = port;
-                        gameStateInfo.ClientIp = ipAddress;
-                        gameStateInfo.TotalWordsToFind = gameFileData.CheckWords;
-                        gameStateInfo.NumberOfWordsLeft = gameFileData.TotalWords;
-                        gameStateInfos.Add(gameStateInfo);
-                    }
-                }
                 //if player pressed play again
-                else
+                // lock state during reset
+                lock (stateInfo.GameStateLocker)
                 {
-                    // lock state during reset
-                    lock (stateInfo.GameStateLocker)
-                    {
-                        //adds all the game state items
-                        stateInfo.NumberOfWordsLeft = 0;
-
-                        stateInfo.TotalWordsFound.Clear();
-                        stateInfo.TotalWordsToFind.Clear();
-                        stateInfo.GameStopwatch.Reset();
-                        stateInfo.GameStopwatch.Start();
-
-                        stateInfo.TotalWordsToFind = gameFileData.CheckWords;
-                        stateInfo.NumberOfWordsLeft = gameFileData.TotalWords;
-                    }
+                    //adds all the game state items
+                    stateInfo.NumberOfWordsLeft = 0;
+                
+                    stateInfo.TotalWordsFound.Clear();
+                    stateInfo.TotalWordsToFind.Clear();
+                    stateInfo.GameStopwatch.Reset();
+                    stateInfo.GameStopwatch.Start();
+                
+                    stateInfo.TotalWordsToFind = gameFileData.CheckWords;
+                    stateInfo.NumberOfWordsLeft = gameFileData.TotalWords;
                 }
                 //if the responseid is 0 that means it did not fail and needs to be filled out
                 if (ResponseID.Length == 0)
