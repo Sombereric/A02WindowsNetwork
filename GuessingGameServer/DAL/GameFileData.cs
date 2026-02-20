@@ -4,7 +4,7 @@
 * PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
 * FIRST VERSION : 2026-2-9
 * DESCRIPTION :
-* handles each request made by the client to the server and the respective action
+* the data formated into a class
 */
 
 namespace GuessingGameServer.DAL
@@ -13,10 +13,14 @@ namespace GuessingGameServer.DAL
     {
         public string CheckSentence {  get; set; }
         public int TotalWords { get; set; }
-
         public List <string> CheckWords { get; set; }
 
-        // constructor
+        /// <summary>
+        /// constructor for the loaded game file
+        /// </summary>
+        /// <param name="checkSentence">the sentence to guess from</param>
+        /// <param name="totalWords">the number of hidden words</param>
+        /// <param name="checkWords">the list of words to find</param>
         public GameFileData(string checkSentence, int totalWords, List<string> checkWords)
         {
             CheckSentence = checkSentence;
