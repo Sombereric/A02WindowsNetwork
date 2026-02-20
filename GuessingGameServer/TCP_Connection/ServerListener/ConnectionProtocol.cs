@@ -15,8 +15,13 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 {
     internal class ConnectionProtocol
     {
-        //code from protocol will be something from the client like 200, 300, something like that
-        //this is what will be turned into a task to allow for multiple connections at once 
+        /// <summary>
+        /// the protocol manager
+        /// </summary>
+        /// <param name="protocolMessage">the split sent data</param>
+        /// <param name="gameStateInfos">list of game states</param>
+        /// <param name="GameStateLocker">the locker to protect the gameStateInfos</param>
+        /// <returns>the formated return string</returns>
         public string ServerProtocolManager(string[] protocolMessage, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
             string serverResponseData = "";
@@ -43,16 +48,17 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     serverResponseData = "400" + '|' + "Illegal Request" + '|' + "invalid" + "|END|";
                     break;
             }
+            //returns the build response data string
             return serverResponseData;
         }
-
         /// <summary>
-        /// this will handle the login logic
+        /// a new user logins 
         /// </summary>
-        /// <param name="userNamePasswordIpPort"></param>
-        /// <param name="guidText"></param>
-        /// <param name="gameStateInfos"></param>
-        /// <param name="actionData"></param>
+        /// <param name="userNamePasswordIpPort">the user data used to login</param>
+        /// <param name="guidText">the unique id</param>
+        /// <param name="gameStateInfos">the gamestate list</param>
+        /// <param name="GameStateLocker">the locker of the game state list</param>
+        /// <returns>the response string for the client</returns>
         private string Login(string userNamePasswordIpPort, string guidText, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
             bool requestFailure = false;
@@ -67,7 +73,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 ServerState = "No Login Data Passed";
                 requestFailure = true;
             }
-
+            //attempts to parse the guid
             Guid parsedGuid;
             if (!Guid.TryParse(guidText, out parsedGuid))
             {
@@ -79,6 +85,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             // split the login data
             string[] checkParts = userNamePasswordIpPort.Split(':');
 
+            //invalid data sent
             if (checkParts.Length != 3)
             {
                 ResponseID = "400";
@@ -93,14 +100,13 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
                 IPAddress checkIP;
                 Int32 checkPort;
-
+                //attempts to parse user ip and port
                 if (!IPAddress.TryParse(ipText, out checkIP))
                 {
                     ResponseID = "400";
                     ServerState = "Invalid IP";
                     requestFailure = true;
                 }
-
                 if (!Int32.TryParse(portText, out checkPort))
                 {
                     ResponseID = "400";
@@ -119,23 +125,23 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 {
                     gameStateInfos.Add(newState);
                 }
-                ;
-
+                //if the responseid length is zero that means it succeeded
                 if (ResponseID.Length == 0)
                 {
                     ResponseID = "200";
                     ServerState = "Successful Login";
                 }
             }
+            //where the response string 
             return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
         }
-
         /// <summary>
         /// this method will made the guess
         /// </summary>
-        /// <param name="gameStateInfos"></param>
-        /// <param name="guess"></param>
-        /// <param name="clientGuid"></param>
+        /// <param name="gameStateInfos">the list of current users</param>
+        /// <param name="guess">the guess the user made</param>
+        /// <param name="clientGuid">the unique id of the user</param>
+        /// <returns>returns the response of the search</returns>
         private string guessMade(List<GameStateInfo> gameStateInfos, string guess, string clientGuid, object GameStateLocker)
         {
             bool requestFailure = false;
@@ -154,6 +160,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     requestFailure = true;
                 }
 
+                //attempts to parse the guid
                 Guid parsedGuid;
                 if (!Guid.TryParse(clientGuid, out parsedGuid))
                 {
@@ -161,8 +168,9 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     ServerState = "Unable to Parse Guid";
                     requestFailure = true;
                 }
-                GameStateInfo stateInfo = null;
 
+                GameStateInfo stateInfo = null;
+                //checks for the current user loggined 
                 lock (GameStateLocker)
                 {
                     for (int checkCount = 0; checkCount < gameStateInfos.Count; checkCount++)
@@ -175,6 +183,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     }
                 }
 
+                //if the gamestate was failed
                 if (stateInfo == null)
                 {
                     ResponseID = "400";
@@ -183,12 +192,13 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 }
                 string cleanTheGuess = "";
 
+                //cleans the white space from the word
                 if (guess != null)
                 {
                     cleanTheGuess = guess.Trim();
                 }
 
-
+                //checks to see if the word was found or not
                 if (stateInfo != null)
                 {
                     lock (stateInfo.GameStateLocker)
@@ -196,13 +206,14 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                         gameRelatedData = foundWordEditor(stateInfo, cleanTheGuess);
                     }
                 }
-
+                //if the responseid is zero that means the game creation has succeeded
                 if (ResponseID.Length == 0)
                 {
                     ResponseID = "200";
                     ServerState = "Successful Guess";
                 }
             }
+            //what is sent to the clients as a response from the server
             return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
         }
         /// <summary>
@@ -210,13 +221,13 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// </summary>
         /// <param name="stateInfo">the current client to check</param>
         /// <param name="cleanTheGuess">the cleaned guess</param>
-        /// <param name="gameRelatedData">the server readable response</param>
         /// <returns>returns the response of the search</returns>
         private string foundWordEditor(GameStateInfo stateInfo, string cleanTheGuess)
         {
             string gameRelatedData = "";
             int lookResult = stateInfo.WordChecker(cleanTheGuess); // check the guess result
 
+            //determines if the word was found or not within the lists
             if (lookResult == 0)
             {
                 stateInfo.AddToWordsFound(cleanTheGuess);
@@ -248,12 +259,11 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             }
             return gameRelatedData;
         }
-
         /// <summary>
         /// handles new games for new players or play again presses
         /// </summary>
         /// <param name="gameStateInfos">the list of current users</param>
-        /// <param name="guidText">the guid of the client who wishes to quit</param>
+        /// <param name="protocolMessage">the list of data sent from the client</param>
         /// <param name="GameStateLocker">a locker to protect the list of game states</param>
         /// <returns>returns a formated response to the client</returns>
         private string NewGame(List<GameStateInfo> gameStateInfos, string[] protocolMessage, object GameStateLocker)
@@ -362,7 +372,6 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             //what is sent to the clients as a response from the server
             return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
         }
-
         /// <summary>
         /// when a client quits the game it removes them from the server list 
         /// </summary>

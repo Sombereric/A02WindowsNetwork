@@ -1,11 +1,17 @@
 ﻿/*
-* FILE : ConnectionHandler.cs
-* PROJECT : PROG2126 - Assignment #2
-* PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
-* FIRST VERSION : 2026-2-9
-* DESCRIPTION :
-* where the connection from the client to the server is handled on the server end
-*/
+ * FILE : ConnectionHandler.cs
+ * PROJECT : PROG2126 - Assignment #2
+ * PROGRAMMER : Eric Moutoux, Will Jessel, Zemmatt Hagos
+ * FIRST VERSION : 2026-2-9
+ * DESCRIPTION :
+ * Handles incoming TCP connections from clients.
+ * Responsible for:
+ *   - Starting/stopping the server
+ *   - Accepting clients
+ *   - Spawning tasks for each client
+ *   - Reading/parsing client messages
+ *   - Sending responses back
+ */
 
 using System.Configuration;
 using System.Net;
@@ -19,54 +25,72 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 {
     internal class ConnectionHandler
     {
+        // UI used for logging server-side messages
         private UI ui = new UI();
+
+        // Used to gracefully shut down all async tasks
         private static CancellationTokenSource cts = new CancellationTokenSource();
+
+        // (Currently unused) list of connected clients
         private static readonly List<TcpClient> clients = new List<TcpClient>();
 
+        // Handles interpreting protocol messages
         ConnectionProtocol connectionProtocol = new ConnectionProtocol();
+
+        // Handles sending messages to connected clients
         ServerClientSender sender = new ServerClientSender();
 
         /// <summary>
-        /// where the server listens for connecting clients
+        /// the main listener of the server
         /// </summary>
+        /// <param name="gameStateInfos">the game state list</param>
+        /// <param name="GameStateLocker">the locker the game state</param>
+        /// <returns>returns the task handler</returns>
         public async Task MainServerListener(List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
-            //used to stop the server should any connection setup fail
             bool serverSetupSuccess = true;
-            //gets the server port and IP from the config file
+
+            // Retrieve port number from app.config
             string ServerPort = ConfigurationManager.AppSettings["ServerPort"];
 
             TcpListener server = null;
+
             try
             {
-                //attempts to parse the port of the server from the app config
+                // Validate that the port number is valid
                 if (!Int32.TryParse(ServerPort, out Int32 port))
                 {
-                    //logs the error and stops the server settingup
                     ui.WriteToConsole("Failure to parse server port");
                     serverSetupSuccess = false;
                 }
+
                 if (serverSetupSuccess)
                 {
-                    //creates the listener
+                    // Create TCP listener on all network interfaces
                     server = new TcpListener(IPAddress.Any, port);
 
-                    //start listening for clients requests
+                    // Begin listening for incoming connections
                     server.Start();
+
+                    // Start background task that accepts clients
                     Task runnerTask = TaskRunner(server, gameStateInfos, GameStateLocker);
 
-                    //lets admins know server is running
                     ui.WriteToConsole("server running");
-
                     ui.WriteToConsole("To stop the server Press Enter...");
+
+                    // Block until admin presses Enter
                     ui.ReadFromConsole();
 
+                    // Signal cancellation to all running tasks
                     cts.Cancel();
 
+                    // Stop accepting new clients
                     server.Stop();
 
+                    // Wait for all client handler tasks to finish
                     await runnerTask;
 
+                    // Final cleanup / final send (if required by assignment logic)
                     await sender.connectToClient(gameStateInfos, GameStateLocker);
 
                     ui.WriteToConsole("Server Closed");
@@ -76,32 +100,40 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             {
                 ui.WriteToConsole("Unexpected server failure " + ex.Message);
             }
-            return;
         }
 
         /// <summary>
-        /// this is where the tasks and connections are handled and created
+        /// used to handle all requests asychronously 
         /// </summary>
-        /// <param name="server">the server name</param>
-        /// <param name="gameStateInfos">the list of game states currently connected</param>
-        /// <param name="GameStateLocker">protects the game state list from multiple changes</param>
-        /// <returns>returns the task handler</returns>
+        /// <param name="server">the server stream</param>
+        /// <param name="gameStateInfos">the list of game states</param>
+        /// <param name="GameStateLocker">the game state locker for the list</param>
+        /// <returns>the handler</returns>
         private async Task TaskRunner(TcpListener server, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
             List<Task> tasks = new List<Task>();
+
             try
             {
                 while (!cts.Token.IsCancellationRequested)
                 {
                     ui.WriteToConsole("Server connection begun");
+
+                    // Wait for a client to connect
                     TcpClient client = await server.AcceptTcpClientAsync();
+
+                    // Start handling the client in a separate async task
                     Task handlerTask = ConnectionClientHandler(client, gameStateInfos, GameStateLocker);
+
                     tasks.Add(handlerTask);
+
+                    // Clean up completed tasks to avoid memory buildup
                     tasks.RemoveAll(task => task.IsCompleted);
                 }
             }
             catch (Exception ex)
             {
+                // Ignore exceptions caused by cancellation
                 if (!cts.Token.IsCancellationRequested)
                 {
                     ui.WriteToConsole(ex.Message);
@@ -109,6 +141,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             }
             finally
             {
+                // Wait for all active client handlers to finish
                 try
                 {
                     await Task.WhenAll(tasks);
@@ -117,88 +150,112 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 {
                     ui.WriteToConsole(ex.Message);
                 }
-                
             }
-            return;
         }
+
         /// <summary>
-        /// 
+        /// handles the connection logic
         /// </summary>
-        /// <param name="client"></param>
-        /// <param name="gameStateInfos"></param>
-        /// <param name="GameStateLocker"></param>
-        /// <returns></returns>
+        /// <param name="client">the client to connect</param>
+        /// <param name="gameStateInfos">the game state list</param>
+        /// <param name="GameStateLocker">the locker for the server list</param>
+        /// <returns>task handler</returns>
         private async Task ConnectionClientHandler(TcpClient client, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
             bool badRequest = false;
-            NetworkStream stream = client.GetStream();
-            string checkMessage = "";
 
-            //server response to client
+            // Get stream for reading/writing to this client
+            NetworkStream stream = client.GetStream();
+
+            string checkMessage = "";
             string checkResponse = "";
 
             bool finishRead = false;
+
             int bufferSizeDefault = 1024;
 
+            // Read buffer size from config
             string checkBuffer = ConfigurationManager.AppSettings["BufferSize"];
 
-            //attempts the parse the buffer size in the config file
+            // Validate buffer size
             if (!int.TryParse(checkBuffer, out int bufferSize))
             {
                 ui.WriteToConsole("Failed to parse buffer in app.config using default of 1024.");
                 bufferSize = bufferSizeDefault;
             }
+
+            // Allocate byte buffer
             byte[] buffer = new byte[bufferSize];
 
             try
             {
+                // Keep reading until:
+                // - "|END|" marker is found
+                // - client disconnects
+                // - cancellation requested
                 while (!finishRead && !cts.Token.IsCancellationRequested)
                 {
-                    int bytesRead = 0;
-                    bytesRead = await stream.ReadAsync(buffer, 0, bufferSize, cts.Token);
+                    int bytesRead = await stream.ReadAsync(buffer, 0, bufferSize, cts.Token);
 
+                    // If 0 bytes read → client disconnected
                     if (bytesRead == 0)
                     {
                         finishRead = true;
                     }
 
-                    //IMPORTANT: decode only what was read
+                    // Decode only the actual bytes read
                     checkMessage += Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+                    // Stop reading once protocol end marker detected
                     if (checkMessage.Contains("|END|"))
                     {
                         finishRead = true;
                     }
                 }
 
-                //removes any extra data after |END|
+                // Locate protocol terminator
                 int endIndex = checkMessage.IndexOf("|END|");
+
                 if (endIndex == -1)
                 {
+                    // If no end marker found → invalid request
                     checkResponse = "400|Invalid Request|failure to parse data|END|";
                     badRequest = true;
                 }
+
                 if (!badRequest)
                 {
                     int endMarkerLength = "|END|".Length;
+
+                    // Extract only the complete protocol message
                     string fullMessage = checkMessage.Substring(0, endIndex + endMarkerLength);
 
-                    //parses the fullMessage
+                    // Split message using '|' delimiter
                     char delimiter = '|';
                     string[] protocolMessage = fullMessage.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
 
+                    // Expecting exactly 6 protocol fields
                     if (protocolMessage.Length == 6)
                     {
-                        checkResponse = connectionProtocol.ServerProtocolManager(protocolMessage, gameStateInfos, GameStateLocker);
+                        // Delegate protocol logic to protocol manager
+                        checkResponse = connectionProtocol.ServerProtocolManager(
+                            protocolMessage,
+                            gameStateInfos,
+                            GameStateLocker
+                        );
                     }
                     else
                     {
                         checkResponse = "400|Invalid Request|failure to parse data|END|";
                     }
                 }
-                    // send it to client
-                    byte[] responseBytes = Encoding.UTF8.GetBytes(checkResponse);
-                    await stream.WriteAsync(responseBytes, 0, responseBytes.Length);
-                    await stream.FlushAsync();
+
+                // Convert response string to bytes
+                byte[] responseBytes = Encoding.UTF8.GetBytes(checkResponse);
+
+                // Send response back to client
+                await stream.WriteAsync(responseBytes, 0, responseBytes.Length);
+                await stream.FlushAsync();
             }
             catch (Exception ex)
             {
@@ -209,10 +266,10 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             }
             finally
             {
+                // Always close connection after handling request
                 stream.Close();
                 client.Close();
             }
-            return;
         }
     }
 }

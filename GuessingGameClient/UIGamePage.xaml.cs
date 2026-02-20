@@ -37,7 +37,6 @@ namespace GuessingGameClient
                 MessageBox.Show("Time is up! Game over.");
                 this.Close();
             }
-
             return;
         }
 
