@@ -177,8 +177,12 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         /// <returns></returns>
         private async Task ConnectionClientHandler(TcpClient client, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
+            bool badRequest = false;
             NetworkStream stream = client.GetStream();
             string checkMessage = "";
+
+            //server response to client
+            string checkResponse = "";
 
             bool finishRead = false;
             int bufferSizeDefault = 1024;
@@ -191,7 +195,6 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 ui.WriteToConsole("Failed to parse buffer in app.config using default of 1024.");
                 bufferSize = bufferSizeDefault;
             }
-
             byte[] buffer = new byte[bufferSize];
 
             try
@@ -213,24 +216,36 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                         finishRead = true;
                     }
                 }
-                char delimiter = '|';
-                string[] protocolMessage = checkMessage.Split(delimiter);
 
-                string checkResponse = "";
-
-                if (protocolMessage.Length == 7)
+                //removes any extra data after |END|
+                int endIndex = checkMessage.IndexOf("|END|");
+                if (endIndex == -1)
                 {
-                    checkResponse = connectionProtocol.ServerProtocolManager(protocolMessage, gameStateInfos, GameStateLocker);
+                    checkResponse = "400|Invalid Request|failure to parse data|END|";
+                    badRequest = true;
                 }
-                else
+                if (!badRequest)
                 {
-                    checkResponse = "400|Invalid Request|-|END|";
-                }
+                    int endMarkerLength = "|END|".Length;
+                    string fullMessage = checkMessage.Substring(0, endIndex + endMarkerLength);
 
-                // send it to client
-                byte[] responseBytes = Encoding.UTF8.GetBytes(checkResponse);
-                await stream.WriteAsync(responseBytes, 0, responseBytes.Length);
-                await stream.FlushAsync();
+                    //parses the fullMessage
+                    char delimiter = '|';
+                    string[] protocolMessage = fullMessage.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (protocolMessage.Length == 6)
+                    {
+                        checkResponse = connectionProtocol.ServerProtocolManager(protocolMessage, gameStateInfos, GameStateLocker);
+                    }
+                    else
+                    {
+                        checkResponse = "400|Invalid Request|failure to parse data|END|";
+                    }
+                }
+                    // send it to client
+                    byte[] responseBytes = Encoding.UTF8.GetBytes(checkResponse);
+                    await stream.WriteAsync(responseBytes, 0, responseBytes.Length);
+                    await stream.FlushAsync();
             }
             catch (Exception ex)
             {
@@ -243,11 +258,6 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             {
                 stream.Close();
                 client.Close();
-
-                lock (locker)
-                {
-                    clients.Remove(client);
-                }
             }
             return;
         }
