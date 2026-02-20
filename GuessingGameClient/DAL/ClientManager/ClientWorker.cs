@@ -7,16 +7,10 @@
 * handles each request made by the client to the server and the respective action
 */
 
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using ClientUI.Protocols;
 
 namespace ClientUI.DAL.ClientManager
 {

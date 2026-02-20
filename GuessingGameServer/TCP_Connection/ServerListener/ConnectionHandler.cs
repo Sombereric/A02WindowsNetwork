@@ -78,54 +78,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             }
             return;
         }
-        /// <summary>
-        /// stops the sub server clients
-        /// </summary>
-        private void StopTheClient()
-        {
-            List<TcpClient> clientsToStop = null;
 
-            lock (locker)
-            {
-                clientsToStop = new List<TcpClient>(clients);
-                clients.Clear();
-            }
-
-            //loops over all clients
-            for (int checkCount = 0; checkCount < clientsToStop.Count; checkCount++)
-            {
-                TcpClient client = clientsToStop[checkCount];
-
-                try
-                {
-                    NetworkStream stream = client.GetStream();
-
-                    byte[] stopMessage = Encoding.UTF8.GetBytes("STOP");
-
-                    stream.Write(stopMessage, 0, stopMessage.Length);
-                    stream.Flush();
-                    stream.Close();
-
-                    ui.WriteToConsole("Stop sent to client");
-                }
-                catch (Exception ex)
-                {
-                    ui.WriteToConsole("Unexpected server failure " + ex.Message);
-                }
-
-                try
-                {
-                    if (client != null)
-                    {
-                        client.Close();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ui.WriteToConsole("Unexpected server failure " + ex.Message);
-                }
-            }
-        }
         /// <summary>
         /// this is where the tasks and connections are handled and created
         /// </summary>
@@ -260,6 +213,54 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 client.Close();
             }
             return;
+        }
+        /// <summary>
+        /// stops the sub server clients
+        /// </summary>
+        private void StopTheClient()
+        {
+            List<TcpClient> clientsToStop = null;
+
+            lock (locker)
+            {
+                clientsToStop = new List<TcpClient>(clients);
+                clients.Clear();
+            }
+
+            //loops over all clients
+            for (int checkCount = 0; checkCount < clientsToStop.Count; checkCount++)
+            {
+                TcpClient client = clientsToStop[checkCount];
+
+                try
+                {
+                    NetworkStream stream = client.GetStream();
+
+                    byte[] stopMessage = Encoding.UTF8.GetBytes("STOP");
+
+                    stream.Write(stopMessage, 0, stopMessage.Length);
+                    stream.Flush();
+                    stream.Close();
+
+                    ui.WriteToConsole("Stop sent to client");
+                }
+                catch (Exception ex)
+                {
+                    ui.WriteToConsole("Unexpected server failure " + ex.Message);
+                }
+
+                try
+                {
+                    if (client != null)
+                    {
+                        client.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ui.WriteToConsole("Unexpected server failure " + ex.Message);
+                }
+            }
         }
     }
 }

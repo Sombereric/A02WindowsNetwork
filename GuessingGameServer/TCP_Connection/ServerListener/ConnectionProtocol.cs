@@ -7,8 +7,6 @@
 * handles each request made by the client to the server and the respective action
 */
 
-using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.Net;
 using GuessingGameServer.DAL;
 using GuessingGameServer.GameLogic;
@@ -27,7 +25,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             switch (protocolMessage[0])
             {
                 case "200": //client login
-                    serverResponseData = Login(protocolMessage[4], protocolMessage[1], gameStateInfos);
+                    serverResponseData = Login(protocolMessage[4], protocolMessage[1], gameStateInfos, GameStateLocker);
                     break;
                 case "201": //guess game
                     serverResponseData = guessMade(gameStateInfos, protocolMessage[4], protocolMessage[1]);
@@ -48,107 +46,16 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         }
 
         /// <summary>
-        /// this method will made the guess
-        /// </summary>
-        /// <param name="gameStateInfos"></param>
-        /// <param name="guess"></param>
-        /// <param name="clientGuid"></param>
-        private string guessMade(List<GameStateInfo> gameStateInfos, string guess, string clientGuid)
-        {
-            string ResponseID = "";
-            string ServerState = "";
-            string gameRelatedData = "";
-
-            //this would be where the guess is handled against the state bag. 
-            if (guess == null || guess.Trim().Length == 0)
-            {
-                gameRelatedData = "Invalid Guess";
-            }
-
-            Guid parsedGuid;
-            if (!Guid.TryParse(clientGuid, out parsedGuid))
-            {
-                ResponseID = "400";
-                ServerState = "Unable to Parse Guid";
-            }
-            GameStateInfo stateInfo = null;
-
-            for (int checkCount = 0; checkCount < gameStateInfos.Count; checkCount++)
-            {
-                if (gameStateInfos[checkCount] != null && gameStateInfos[checkCount].ClientGuid == parsedGuid)
-                {
-                    stateInfo = gameStateInfos[checkCount];
-                    break;
-                }
-
-            }
-
-            if (stateInfo == null)
-            {
-                ResponseID = "400";
-                ServerState = "No state info found";
-            }
-
-            string cleanTheGuess = guess.Trim();
-
-            int lookResult; // check the guess result
-
-            lock (stateInfo.GameStateLocker)
-            {
-                lookResult = stateInfo.WordChecker(cleanTheGuess);
-
-                if (lookResult == 0)
-                {
-                    stateInfo.AddToWordsFound(cleanTheGuess);
-
-                    if (stateInfo.NumberOfWordsLeft > 0)
-                    {
-                        stateInfo.NumberOfWordsLeft--;
-                    }
-
-                    if (stateInfo.NumberOfWordsLeft == 0)
-                    {
-                        gameRelatedData = "WINNER";
-                    }
-
-                    gameRelatedData = "FOUND" + ':' + stateInfo.NumberOfWordsLeft;
-                    stateInfo.NumberOfWordsLeft--;
-
-                    foreach (string word in stateInfo.TotalWordsFound)
-                    {
-                        gameRelatedData += ':' + word ;
-                    }
-                    stateInfo.TotalWordsFound.Add(cleanTheGuess);
-
-                }
-                else if (lookResult == 1)
-                {
-                    gameRelatedData = "NOT FOUND";
-
-                }
-                else if (lookResult == 2)
-                {
-                    gameRelatedData = "ALREADY FOUND";
-                }
-            }
-
-            if (ResponseID.Length == 0)
-            {
-                ResponseID = "200";
-                ServerState = "Successful Guess";
-            }
-            return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
-        }
-
-        /// <summary>
         /// this will handle the login logic
         /// </summary>
         /// <param name="userNamePasswordIpPort"></param>
         /// <param name="guidText"></param>
         /// <param name="gameStateInfos"></param>
         /// <param name="actionData"></param>
-        private string Login(string userNamePasswordIpPort, string guidText, List<GameStateInfo> gameStateInfos)
+        private string Login(string userNamePasswordIpPort, string guidText, List<GameStateInfo> gameStateInfos, object GameStateLocker)
         {
+            bool requestFailure = false;
+
             string ResponseID = "";
             string ServerState = "";
             string gameRelatedData = "";
@@ -157,6 +64,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             {
                 ResponseID = "400";
                 ServerState = "No Login Data Passed";
+                requestFailure = true;
             }
 
             Guid parsedGuid;
@@ -164,51 +72,168 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             {
                 ResponseID = "400";
                 ServerState = "Unable to Parse Guid";
+                requestFailure = true;
             }
 
             // split the login data
             string[] checkParts = userNamePasswordIpPort.Split(':');
 
-            if (checkParts.Length != 4)
+            if (checkParts.Length != 3)
             {
                 ResponseID = "400";
                 ServerState = "Invalid Action Data";
+                requestFailure = true;
             }
 
-
-            string ipText = checkParts[2];
-            string portText = checkParts[3];
-
-            IPAddress checkIP;
-            Int32 checkPort;
-
-            if (!IPAddress.TryParse(ipText, out checkIP))
+            if (!requestFailure)
             {
-                ResponseID = "400";
-                ServerState = "Invalid IP";
-            }
+                string ipText = checkParts[1];
+                string portText = checkParts[2];
 
-            if(!Int32.TryParse(portText, out checkPort))
-            {
-                ResponseID = "400";
-                ServerState = "Invalid Port";
-            }
+                IPAddress checkIP;
+                Int32 checkPort;
 
-            // create new game state object
-            GameStateInfo newState = new GameStateInfo();
-            newState.ClientGuid = parsedGuid;
-            newState.ClientIp = checkIP;
-            newState.Port = checkPort;
+                if (!IPAddress.TryParse(ipText, out checkIP))
+                {
+                    ResponseID = "400";
+                    ServerState = "Invalid IP";
+                    requestFailure = true; 
+                }
 
-            // add new state to list
-            gameStateInfos.Add(newState);
+                if (!Int32.TryParse(portText, out checkPort))
+                {
+                    ResponseID = "400";
+                    ServerState = "Invalid Port";
+                    requestFailure = true;
+                }
 
-            if (ResponseID.Length == 0)
-            {
-                ResponseID = "200";
-                ServerState = "Successful Guess";
+                // create new game state object
+                GameStateInfo newState = new GameStateInfo();
+                newState.ClientGuid = parsedGuid;
+                newState.ClientIp = checkIP;
+                newState.Port = checkPort;
+
+                // add new state to list
+                lock (GameStateLocker){
+                    gameStateInfos.Add(newState);
+                };
+                
+                if (ResponseID.Length == 0)
+                {
+                    ResponseID = "200";
+                    ServerState = "Successful Login";
+                }
             }
             return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
+        }
+
+        /// <summary>
+        /// this method will made the guess
+        /// </summary>
+        /// <param name="gameStateInfos"></param>
+        /// <param name="guess"></param>
+        /// <param name="clientGuid"></param>
+        private string guessMade(List<GameStateInfo> gameStateInfos, string guess, string clientGuid)
+        {
+            bool requestFailure = false;
+
+            string ResponseID = "";
+            string ServerState = "";
+            string gameRelatedData = "";
+            if (!requestFailure)
+            {
+                //this would be where the guess is handled against the state bag. 
+                if (guess == null || guess.Trim().Length == 0)
+                {
+                    ResponseID = "400";
+                    gameRelatedData = "Invalid Guess";
+                    requestFailure = true;
+                }
+
+                Guid parsedGuid;
+                if (!Guid.TryParse(clientGuid, out parsedGuid))
+                {
+                    ResponseID = "400";
+                    ServerState = "Unable to Parse Guid";
+                    requestFailure = true;
+                }
+                GameStateInfo stateInfo = null;
+
+                for (int checkCount = 0; checkCount < gameStateInfos.Count; checkCount++)
+                {
+                    if (gameStateInfos[checkCount] != null && gameStateInfos[checkCount].ClientGuid == parsedGuid)
+                    {
+                        stateInfo = gameStateInfos[checkCount];
+                        break;
+                    }
+                }
+
+                if (stateInfo == null)
+                {
+                    ResponseID = "400";
+                    ServerState = "No state info found";
+                    requestFailure = true;
+                }
+
+                string cleanTheGuess = guess.Trim();
+
+                if (stateInfo != null)
+                {
+                    lock (stateInfo.GameStateLocker)
+                    {
+                        gameRelatedData = foundWordEditor(stateInfo, cleanTheGuess, gameRelatedData);
+                    }
+                }
+
+                if (ResponseID.Length == 0)
+                {
+                    ResponseID = "200";
+                    ServerState = "Successful Guess";
+                }
+            }    
+            return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
+        }
+        /// <summary>
+        /// handles the checking of the currently found words
+        /// </summary>
+        /// <param name="stateInfo">the current client to check</param>
+        /// <param name="cleanTheGuess">the cleaned guess</param>
+        /// <param name="gameRelatedData">the server readable response</param>
+        /// <returns>returns the response of the search</returns>
+        private string foundWordEditor(GameStateInfo stateInfo, string cleanTheGuess, string gameRelatedData)
+        {
+            int lookResult = stateInfo.WordChecker(cleanTheGuess); // check the guess result
+
+            if (lookResult == 0)
+            {
+                stateInfo.AddToWordsFound(cleanTheGuess);
+
+                if (stateInfo.NumberOfWordsLeft > 0)
+                {
+                    gameRelatedData = "FOUND" + ':' + stateInfo.NumberOfWordsLeft;
+                    stateInfo.NumberOfWordsLeft--;
+                }
+
+                if (stateInfo.NumberOfWordsLeft == 0)
+                {
+                    gameRelatedData = "WINNER";
+                }
+
+                foreach (string word in stateInfo.TotalWordsFound)
+                {
+                    gameRelatedData += ':' + word;
+                }
+            }
+            else if (lookResult == 1)
+            {
+                gameRelatedData = "NOT FOUND";
+
+            }
+            else if (lookResult == 2)
+            {
+                gameRelatedData = "ALREADY FOUND";
+            }
+            return gameRelatedData;
         }
 
         /// <summary>
