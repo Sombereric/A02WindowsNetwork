@@ -7,13 +7,8 @@
 * handles each request made by the client to the server and the respective action
 */
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GuessingGameServer.GameLogic
 {
@@ -47,6 +42,7 @@ namespace GuessingGameServer.GameLogic
         public int WordChecker(string GuessedWord)
         {
             int guessedWordResult = 0;
+            GuessedWord.ToLower();
 
             if (!CheckIfNewWord(GuessedWord))
             {
@@ -68,6 +64,7 @@ namespace GuessingGameServer.GameLogic
         public bool CheckIfNewWord(string GuessedWord)
         {
             bool NewWord = false;
+            GuessedWord.ToLower();
 
             foreach(string word in TotalWordsToFind)
             {
@@ -86,6 +83,7 @@ namespace GuessingGameServer.GameLogic
         public bool CheckIfWordAlreadyFound(string GuessedWord)
         {
             bool AlreadyFound = false;
+            GuessedWord.ToLower();
 
             foreach (string word in TotalWordsFound)
             {
@@ -102,6 +100,7 @@ namespace GuessingGameServer.GameLogic
         /// <param name="GuessedWord">the word to add</param>
         public void AddToWordsFound(string GuessedWord)
         {
+            GuessedWord.ToLower();
             lock (GameStateLocker)
             {
                 TotalWordsFound.Add(GuessedWord);

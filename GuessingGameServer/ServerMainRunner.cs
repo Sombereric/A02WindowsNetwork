@@ -9,7 +9,6 @@
 
 using GuessingGameServer.GameLogic;
 using GuessingGameServer.TCP_Connection.ServerListener;
-using GuessingGameServer.UserInterface;
 
 namespace GuessingGameServer
 {

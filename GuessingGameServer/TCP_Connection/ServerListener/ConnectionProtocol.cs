@@ -250,10 +250,12 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
         }
 
         /// <summary>
-        /// this will handles restting a game
+        /// handles new games for new players or play again presses
         /// </summary>
-        /// <param name="gameStateInfos"></param>
-        /// <param name="guidText"></param>
+        /// <param name="gameStateInfos">the list of current users</param>
+        /// <param name="guidText">the guid of the client who wishes to quit</param>
+        /// <param name="GameStateLocker">a locker to protect the list of game states</param>
+        /// <returns>returns a formated response to the client</returns>
         private string NewGame(List<GameStateInfo> gameStateInfos, string[] protocolMessage, object GameStateLocker)
         {
             bool requestFailure = false;
@@ -264,6 +266,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
             while (!requestFailure)
             {
+                //attempts to parse guid and exits loop if fails
                 Guid parsedGuid;
                 if (!Guid.TryParse(protocolMessage[1], out parsedGuid))
                 {
@@ -272,6 +275,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     requestFailure = true;
                 }
 
+                //protects the game state data
                 GameStateInfo stateInfo = null;
                 lock (GameStateLocker)
                 {
@@ -289,13 +293,13 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                 char delimiter = ':';
                 string[] actionData = protocolMessage[4].Split(delimiter);
 
+                //attempts to parse data and exits loop if fails
                 if (actionData.Length != 3)
                 {
                     ResponseID = "400";
                     ServerState = "Unable to parse action Data";
                     requestFailure = true;
                 }
-
                 if (!Int32.TryParse(actionData[2], out int port))
                 {
                     ResponseID = "400";
@@ -314,6 +318,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
 
                 gameRelatedData = gameFileData.CheckSentence + ':' + gameFileData.TotalWords;
 
+                //if new player
                 if (stateInfo == null)
                 {
                     lock (GameStateLocker)
@@ -327,37 +332,44 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                         gameStateInfos.Add(gameStateInfo);
                     }
                 }
-                //if new player
+                //if player pressed play again
                 else
                 {
                     // lock state during reset
                     lock (stateInfo.GameStateLocker)
                     {
+                        //adds all the game state items
+                        stateInfo.NumberOfWordsLeft = 0;
+
                         stateInfo.TotalWordsFound.Clear();
                         stateInfo.TotalWordsToFind.Clear();
-                        stateInfo.NumberOfWordsLeft = 0;
-                        stateInfo.TotalWordsToFind = gameFileData.CheckWords;
-                        stateInfo.NumberOfWordsLeft = gameFileData.TotalWords;
                         stateInfo.GameStopwatch.Reset();
                         stateInfo.GameStopwatch.Start();
+
+                        stateInfo.TotalWordsToFind = gameFileData.CheckWords;
+                        stateInfo.NumberOfWordsLeft = gameFileData.TotalWords;
                     }
                 }
-
+                //if the responseid is 0 that means it did not fail and needs to be filled out
                 if (ResponseID.Length == 0)
                 {
                     ResponseID = "200";
                     ServerState = "Successful Game State Update";
                 }
+                //breaks out of the one through loop
                 break;
             }
+            //what is sent to the clients as a response from the server
             return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
         }
 
         /// <summary>
-        /// this will stop the game
+        /// when a client quits the game it removes them from the server list 
         /// </summary>
-        /// <param name="gameStateInfos"></param>
-        /// <param name="guidText"></param>
+        /// <param name="gameStateInfos">the list of current users</param>
+        /// <param name="guidText">the guid of the client who wishes to quit</param>
+        /// <param name="GameStateLocker">a locker to protect the list of game states</param>
+        /// <returns>returns a formated response to the client</returns>
         private string QuitGame(List<GameStateInfo> gameStateInfos, string guidText, object GameStateLocker)
         {
             bool parseFailure = false;
@@ -376,27 +388,31 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             }
             if (!parseFailure)
             {
+                //searches the list for the matching GUID
                 lock (GameStateLocker)
                 {
                     for (int checkCount = 0; checkCount < gameStateInfos.Count; checkCount++)
                     {
+                        //if the GUID is found delete the user and exit the list
                         if (gameStateInfos[checkCount] != null && gameStateInfos[checkCount].ClientGuid == parsedGuid)
                         {
                             gameStateInfos.RemoveAt(checkCount);
                             ResponseID = "200";
                             ServerState = "Game client Removed";
                             deleteSuccess = true;
+                            //breaks out the for loop
                             break;
                         }
                     }
                 }
-
+                //if the delete from the list was a failure
                 if (!deleteSuccess)
                 {
                     ResponseID = "400";
                     ServerState = "Failure To Delete Client Info";
                 }
             }
+            //what is sent to the clients as a response from the server
             return ResponseID + '|' + ServerState + '|' + gameRelatedData + "|END|";
         }
     }

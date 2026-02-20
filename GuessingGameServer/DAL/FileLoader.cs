@@ -6,21 +6,18 @@
 * DESCRIPTION :
 * handles each request made by the client to the server and the respective action
 */
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using GuessingGameServer.UserInterface;
 
 namespace GuessingGameServer.DAL
 {
     internal class fileLoader
     {
+        private UI ui = new UI();
         /// <summary>
-        /// 
+        /// loads a random game file
         /// </summary>
+        /// <returns>returns the data from said loaded file</returns>
         public static GameFileData LoadRandomGame()
         {
             string[] gameFiles = { "game1.txt", "game2.txt", "game3.txt", "game4.txt"};
@@ -33,7 +30,6 @@ namespace GuessingGameServer.DAL
 
             return LoadGameFile(selectedFile);
 
-
         }
 
         /// <summary>
@@ -43,39 +39,53 @@ namespace GuessingGameServer.DAL
         /// <exception cref="Exception"></exception>
         public static GameFileData? LoadGameFile(string filePath)
         {
-            if (!File.Exists(filePath))
+            GameFileData gameFileData = null;
+            bool loaderFailure = false;
+            try
             {
-                return null;
-            }
-
-            string[] checkLine = File.ReadAllLines(filePath);
-
-            int underLength = 3; // made sure the minium is 3 for the lines
-
-            if(checkLine.Length < underLength)
-            {
-                return null;
-            }
-
-            string checkSentence = checkLine[0].Trim();
-
-            int totalWords = int.Parse(checkLine[1]);
-
-            List<string> wordsList = new List<string>();
-
-            int wordStart = 2; // this will start the index number made sure i started at 2
-            
-            for (int checkCount = wordStart; checkCount < checkLine.Length; checkCount++)
-            {
-                string checkWord = checkLine[checkCount].Trim();
-
-                if (checkWord.Length > 0)
+                while (!loaderFailure)
                 {
-                    wordsList.Add(checkWord);
+                    if (!File.Exists(filePath))
+                    {
+                        loaderFailure = true;
+                    }
+
+                    string[] checkLine = File.ReadAllLines(filePath);
+
+                    int underLength = 3; // made sure the minium is 3 for the lines
+
+                    if (checkLine.Length < underLength)
+                    {
+                        loaderFailure = true;
+                    }
+
+                    string checkSentence = checkLine[0].Trim();
+
+                    List<string> wordsList = new List<string>();
+
+                    int wordStart = 2; // this will start the index number made sure i started at 2
+
+                    for (int checkCount = wordStart; checkCount < checkLine.Length; checkCount++)
+                    {
+                        string checkWord = checkLine[checkCount].Trim();
+
+                        if (checkWord.Length > 0)
+                        {
+                            wordsList.Add(checkWord.ToLower());
+                        }
+                    }
+
+                    int totalWords = wordsList.Count();
+
+                    gameFileData = new GameFileData(checkSentence, totalWords, wordsList);
+                    break;
                 }
             }
-
-            return new GameFileData(checkSentence, totalWords, wordsList);
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failure to load files " + ex.Message);
+            }
+            return gameFileData;
         }
     }
 }
