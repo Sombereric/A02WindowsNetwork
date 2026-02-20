@@ -1,8 +1,8 @@
 ﻿namespace GuessingGameClient.GameLogic
 {
-    internal class gameState
+    public class gameState
     {
-        private string wordToGuessFrom;
-        private string numberToGuess;
+        public string wordToGuessFrom;
+        public int numberToGuess;
     }
 }

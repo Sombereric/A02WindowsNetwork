@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ClientUI.DAL.ClientManager;
+using GuessingGameClient.GameLogic;
 using GuessingGameClient.Protocols;
 
 
@@ -21,7 +22,8 @@ namespace GuessingGameClient
     public partial class MainWindow : Window
     {
         private static Guid clientGuid = Guid.NewGuid();
-        clientSenderHandler clientSenderHandler = new clientSenderHandler();
+        private static gameState gameState = new gameState();
+        private clientSenderHandler clientSender = new clientSenderHandler();
         public MainWindow()
         {
             InitializeComponent();
@@ -34,9 +36,9 @@ namespace GuessingGameClient
         {
             try
             {
-                await clientSenderHandler.testFunction(UserNameTB.Text, clientGuid);
+                await clientSender.testFunction(UserNameTB.Text, clientGuid, gameState);
 
-                UIGamePage uIGamePage = new UIGamePage(clientGuid);
+                UIGamePage uIGamePage = new UIGamePage(clientGuid, gameState);
                 uIGamePage.Show();
 
                 Close();

@@ -1,14 +1,23 @@
 ﻿using System.Windows;
+using ClientUI.DAL.ClientManager;
+using GuessingGameClient.GameLogic;
 
 namespace GuessingGameClient
 {
     public partial class UIGamePage : Window
     {
         public Guid clientGuid;
-        public UIGamePage(Guid ClientGuid)
+        private ClientWorker clientWorker = new ClientWorker();
+        public string wordsToGuess;
+        public int numberToGuess;
+        public UIGamePage(Guid ClientGuid, gameState gameState)
         {
             clientGuid = ClientGuid;
+            wordsToGuess = gameState.wordToGuessFrom;
+            numberToGuess = gameState.numberToGuess;
             InitializeComponent();
+            WordsToGuessFromTB.Text = wordsToGuess;
+            WordsLeftToGuessTB.Text = numberToGuess.ToString();
         }
         public UIGamePage()
         {
@@ -70,12 +79,12 @@ namespace GuessingGameClient
 
             string[] actionData = parts[2].Split(':');
 
-            if (WordCountBox.Text.Length == 0)
+            if (WordsToGuessFromTB.Text.Length == 0)
             {
-                WordCountBox.Text = actionData[0];
+                WordsToGuessFromTB.Text = actionData[0];
             }
 
-            StringDisplayTB.Text = actionData[1];
+            WordsLeftToGuessTB.Text = actionData[1];
             actionData[0] = "";
             actionData[1] = "";
             WordsFound.Text = "";

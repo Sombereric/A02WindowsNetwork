@@ -239,35 +239,33 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
             string gameRelatedData = "";
             int lookResult = stateInfo.WordChecker(cleanTheGuess); // check the guess result
 
-            //determines if the word was found or not within the lists
-            if (lookResult == 0)
-            {
-                stateInfo.AddToWordsFound(cleanTheGuess);
+            stateInfo.AddToWordsFound(cleanTheGuess);
 
-                if (stateInfo.NumberOfWordsLeft > 0)
-                {
+            switch (lookResult) {
+                case 1:
                     stateInfo.NumberOfWordsLeft--;
-                    gameRelatedData = "FOUND" + ':' + stateInfo.NumberOfWordsLeft;
-                }
+                    stateInfo.AddToWordsFound(cleanTheGuess);
+                    string holder = "";
+                    foreach (string word in stateInfo.TotalWordsFound)
+                    {
+                        holder += ':' + word;
+                    }
 
-                if (stateInfo.NumberOfWordsLeft == 0)
-                {
-                    gameRelatedData = "WINNER";
-                }
-
-                foreach (string word in stateInfo.TotalWordsFound)
-                {
-                    gameRelatedData += ':' + word;
-                }
-            }
-            else if (lookResult == 1)
-            {
-                gameRelatedData = "NOT FOUND";
-
-            }
-            else if (lookResult == 2)
-            {
-                gameRelatedData = "ALREADY FOUND";
+                    gameRelatedData = "FOUND" + ':' + stateInfo.NumberOfWordsLeft + holder;
+                    break;
+                case 2:
+                    gameRelatedData = "ALREADY FOUND";
+                    break;
+                case 0:
+                    if (stateInfo.NumberOfWordsLeft == 0)
+                    {
+                        gameRelatedData = "WINNER";
+                    }
+                    else
+                    {
+                        gameRelatedData = "NOT FOUND";
+                    }
+                        break;
             }
             return gameRelatedData;
         }
@@ -348,10 +346,7 @@ namespace GuessingGameServer.TCP_Connection.ServerListener
                     stateInfo.NumberOfWordsLeft = 0;
                 
                     stateInfo.TotalWordsFound.Clear();
-                    stateInfo.TotalWordsToFind.Clear();
-                    stateInfo.GameStopwatch.Reset();
-                    stateInfo.GameStopwatch.Start();
-                
+                    stateInfo.TotalWordsToFind.Clear();                
                     stateInfo.TotalWordsToFind = gameFileData.CheckWords;
                     stateInfo.NumberOfWordsLeft = gameFileData.TotalWords;
                 }

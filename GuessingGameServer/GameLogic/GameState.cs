@@ -71,6 +71,7 @@ namespace GuessingGameServer.GameLogic
                 if (word == GuessedWord)
                 {
                     NewWord = true;
+                    break;
                 }
             }
             return NewWord;
